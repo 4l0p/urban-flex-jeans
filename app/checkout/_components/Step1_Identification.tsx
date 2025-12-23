@@ -431,11 +431,13 @@ export default function Step1_Identification({
         </button>
 
         {/* Ícones de Pagamento no Footer */}
-        <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-center gap-2 opacity-30">
-          <div className="h-5 w-8 bg-zinc-700 rounded"></div>
-          <div className="h-5 w-8 bg-zinc-700 rounded"></div>
-          <div className="h-5 w-8 bg-zinc-700 rounded"></div>
-          <div className="h-5 w-8 bg-zinc-700 rounded"></div>
+        <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-center gap-2 opacity-50">
+          <img src="/card-master.svg" alt="" />
+          <img src="/card-visa.svg" alt="" />
+          <img src="/card-elo.svg" alt="" />
+          <img src="/card-amex.svg" alt="" />
+          <img src="/card-diners.svg" alt="" />
+          <img className="w-20 h-auto" src="/pix.png" alt="" />
         </div>
       </div>
     </div>
