@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  /* Aqui criamos a animação personalizada */
+  --animate-slide-in-right: slideIn 0.3s ease-out;
+
+  @keyframes slideIn {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+}
+
+/* Configurações básicas de cores e fontes */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* --- CONFIGURAÇÃO DE FONTES (V4) --- */
+
+/* Aplica Inter como padrão no corpo do site */
+body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Aplica Montserrat automaticamente em Títulos e Botões */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700; /* Força negrito nos títulos/botões */
+}
+
+/* Classe utilitária caso queira forçar Montserrat em outro lugar */
+.font-alt {
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+button {
+  @apply cursor-pointer;
+}
