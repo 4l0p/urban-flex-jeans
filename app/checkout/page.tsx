@@ -82,6 +82,10 @@ function CheckoutContent() {
 
   const [selectedSize, setSelectedSize] = useState("M");
   const [productPrice, setProductPrice] = useState(99.9);
+
+  // ESTADO DA QUANTIDADE ELEVADO PARA O PAI
+  const [quantity, setQuantity] = useState(1);
+
   const [shippingMethod, setShippingMethod] = useState<"free" | "express">(
     "free"
   );
@@ -114,7 +118,7 @@ function CheckoutContent() {
           const data = JSON.parse(storedData);
           if (data.size) setSelectedSize(data.size);
           if (data.price) setProductPrice(Number(data.price));
-          if (data.shipping) setShippingMethod(data.shipping); // Lê 'shipping' se vier da Home
+          if (data.shipping) setShippingMethod(data.shipping);
         } catch (error) {
           console.error(error);
         }
@@ -143,13 +147,17 @@ function CheckoutContent() {
 
   // --- CORREÇÃO AQUI ---
   const handleFinishCheckout = () => {
+    // Calcula o preço total baseado na quantidade
+    const totalProductPrice = productPrice * quantity;
+
     const finalOrderData = {
       customer,
       address,
       paymentMethod,
-      shipping: shippingMethod, // <--- Renomeado para 'shipping' para casar com a ThankYou page
+      shipping: shippingMethod, // RENOMEADO para 'shipping' para corresponder à página Thank You
       size: selectedSize,
-      price: productPrice,
+      price: totalProductPrice, // Salva o preço TOTAL dos produtos
+      quantity: quantity, // Salva a quantidade
     };
 
     sessionStorage.setItem("checkoutData", JSON.stringify(finalOrderData));
@@ -158,6 +166,7 @@ function CheckoutContent() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-gray-300 font-sans selection:bg-sky-500/30">
+      {/* HEADER + TIMER */}
       <header className="sticky top-0 z-50 bg-zinc-950 shadow-xl shadow-black/20">
         <div className="bg-[#0f172a] text-center py-1.5 border-b border-zinc-800">
           <p className="text-[10px] md:text-xs font-medium text-white flex items-center justify-center gap-2 animate-pulse">
@@ -168,6 +177,7 @@ function CheckoutContent() {
             </span>
           </p>
         </div>
+
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-14 md:h-20 flex items-center justify-between">
           <Link
             href="/"
@@ -177,6 +187,7 @@ function CheckoutContent() {
             <span className="hidden md:inline">JEANS</span>{" "}
             <span className="text-sky-500">.</span>
           </Link>
+
           <div className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-400 opacity-80 text-right leading-tight">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -199,6 +210,7 @@ function CheckoutContent() {
         </div>
       </header>
 
+      {/* TRILHA DE PROGRESSO */}
       <div className="md:hidden grid grid-cols-3 px-6 py-3 bg-zinc-900/50 border-b border-zinc-800 mb-2 sticky top-[85px] z-40 backdrop-blur-md">
         {[1, 2, 3].map((step) => (
           <div
@@ -226,7 +238,9 @@ function CheckoutContent() {
         ))}
       </div>
 
+      {/* GRID PRINCIPAL */}
       <main className="max-w-[1200px] mx-auto px-4 py-4 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* COLUNA 1 */}
         <div className="lg:col-span-4 space-y-4 order-2 lg:order-1">
           <div className={`${currentStep === 1 ? "block" : "hidden lg:block"}`}>
             <Step1_Identification
@@ -237,6 +251,7 @@ function CheckoutContent() {
               goToStep={goToStep}
             />
           </div>
+
           <div className={`${currentStep === 2 ? "block" : "hidden lg:block"}`}>
             <Step2_Delivery
               currentStep={currentStep}
@@ -249,11 +264,13 @@ function CheckoutContent() {
               clientName={customer.name}
             />
           </div>
+
           <div className="md:hidden block">
             {(currentStep === 1 || currentStep === 2) && <SocialProof />}
           </div>
         </div>
 
+        {/* COLUNA 2 */}
         <div className="lg:col-span-4 order-3 lg:order-2">
           <div className={`${currentStep === 3 ? "block" : "hidden lg:block"}`}>
             <Step3_Payment
@@ -268,12 +285,15 @@ function CheckoutContent() {
           </div>
         </div>
 
+        {/* COLUNA 3 */}
         <div className="lg:col-span-4 order-1 lg:order-3">
           <OrderSummary
             shippingMethod={shippingMethod}
             paymentMethod={paymentMethod}
             selectedSize={selectedSize}
             productPrice={productPrice}
+            quantity={quantity} // Passando quantidade para o filho
+            setQuantity={setQuantity} // Passando setQuantity para o filho
           />
           <div className="hidden md:block mt-6">
             <SocialProof />
@@ -281,6 +301,7 @@ function CheckoutContent() {
         </div>
       </main>
 
+      {/* FOOTER */}
       <footer className="py-8 md:py-10 border-t border-zinc-900 text-center bg-zinc-950 mt-auto">
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-4">

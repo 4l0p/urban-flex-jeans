@@ -7,6 +7,9 @@ interface OrderSummaryProps {
   paymentMethod: "credit" | "pix" | "boleto";
   selectedSize: string;
   productPrice: number;
+  // NOVAS PROPS: Recebendo o controle do Pai
+  quantity: number;
+  setQuantity: (quantity: number) => void;
 }
 
 export default function OrderSummary({
@@ -14,23 +17,28 @@ export default function OrderSummary({
   paymentMethod,
   selectedSize,
   productPrice,
+  quantity, // Vem do pai
+  setQuantity, // Vem do pai
 }: OrderSummaryProps) {
   const SHIPPING_COST_EXPRESS = 14.9;
 
-  const [quantity, setQuantity] = useState(1);
+  // REMOVIDO: const [quantity, setQuantity] = useState(1); <-- Estado local removido
   const [coupon, setCoupon] = useState("");
-  const [isOpen, setIsOpen] = useState(false); // Estado exclusivo para Mobile
+  const [isOpen, setIsOpen] = useState(false);
 
   // Cálculos
   const subtotal = productPrice * quantity;
   const shippingCost = shippingMethod === "free" ? 0 : SHIPPING_COST_EXPRESS;
   const totalBeforeDiscount = subtotal + shippingCost;
   const pixDiscount = paymentMethod === "pix" ? totalBeforeDiscount * 0.05 : 0;
+
+  // CORREÇÃO DE LÓGICA: O desconto de boleto também deve ser visualizado aqui se a regra for a mesma
+  // Mas mantendo a lógica original do seu código:
   const finalTotal = totalBeforeDiscount - pixDiscount;
 
-  const handleIncrement = () => setQuantity((prev) => prev + 1);
-  const handleDecrement = () =>
-    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  // Ajuste nas funções para usar o setQuantity recebido via prop (que espera um número, não uma função de callback direta do prev state do hook local antigo, embora o useState do pai aceite. Para segurança, passamos o valor direto)
+  const handleIncrement = () => setQuantity(quantity + 1);
+  const handleDecrement = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
   return (
     <div className="space-y-4">
@@ -79,7 +87,6 @@ export default function OrderSummary({
         </div>
 
         {/* --- CONTEÚDO (Híbrido) --- */}
-        {/* Mobile: Abre/Fecha com state. Desktop: Sempre visível (block). */}
         <div
           className={`px-6 pb-6 ${
             isOpen
@@ -87,7 +94,7 @@ export default function OrderSummary({
               : "hidden"
           } md:block border-t border-zinc-800/50 md:border-t-0 pt-4 md:pt-0`}
         >
-          {/* Inputs de Cupom e Lista de Valores (Código inalterado) */}
+          {/* Inputs de Cupom e Lista de Valores */}
           <div className="flex gap-2 mb-6">
             <input
               type="text"
