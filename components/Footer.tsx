@@ -26,14 +26,14 @@ export default function Footer() {
                 </p>
                 <div>
                   <span className="block text-xs uppercase font-bold text-zinc-500 mb-1">
-                    WhatsApp / Telefone
+                    Central de Atendimento
                   </span>
                   <a
                     href="https://wa.me/5581996490084"
                     target="_blank"
                     className="text-white font-bold text-xl hover:text-sky-500 transition-colors"
                   >
-                    (81) 9 9649-0084
+                    (81) 9 9502 3626
                   </a>
                 </div>
                 <div>
@@ -105,27 +105,35 @@ export default function Footer() {
               <h3 className="text-white font-bold text-lg mb-6 uppercase tracking-wider">
                 Pagamento
               </h3>
-              <div className="flex items-center gap-3">
-                <img
-                  src="/pix.png"
-                  alt="Pix"
-                  className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                />
-                <img
-                  src="/visa.png"
-                  alt="Visa"
-                  className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                />
-                <img
-                  src="/master.png"
-                  alt="Mastercard"
-                  className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                />
-                <img
-                  src="/elo.png"
-                  alt="Elo"
-                  className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                />
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/pix.png"
+                    alt="Pix"
+                    className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  />
+                  <img
+                    src="/visa.png"
+                    alt="Visa"
+                    className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  />
+                  <img
+                    src="/master.png"
+                    alt="Mastercard"
+                    className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  />
+                  <img
+                    src="/elo.png"
+                    alt="Elo"
+                    className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  />
+                  <img
+                    src="/card-amex.svg"
+                    alt="Amex"
+                    className="h-6 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <p className="text-xs text-zinc-500 mt-2">Entre outros.</p>
               </div>
             </div>
 
@@ -196,7 +204,7 @@ export default function Footer() {
           <div className="border-t border-zinc-900 pt-8 text-center md:text-left">
             <div className="mb-4">
               <span className="text-2xl font-black tracking-tighter text-zinc-700">
-                URBAN FLEX
+                URBAN FLEX JEANS
               </span>
             </div>
             <div className="text-[10px] md:text-xs text-zinc-500 leading-relaxed space-y-2">

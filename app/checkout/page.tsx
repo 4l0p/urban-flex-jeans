@@ -9,7 +9,7 @@ import Step2_Delivery from "./_components/Step2_Delivery";
 import Step3_Payment from "./_components/Step3_Payment";
 import OrderSummary from "./_components/OrderSummary";
 
-// --- Componente de Prova Social ---
+// --- Componente de Prova Social (Mantido igual) ---
 const reviews = [
   {
     initials: "LS",
@@ -32,12 +32,10 @@ const reviews = [
 ];
 
 const SocialProof = () => (
-  // MUDANÇA: bg-zinc-900 -> bg-card | border-zinc-800 -> border-border
   <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-lg opacity-80 hover:opacity-100 transition-opacity mt-6 md:mt-0 space-y-6">
     {reviews.map((review, index) => (
       <div
         key={index}
-        // MUDANÇA: border-zinc-800 -> border-border
         className={index !== 0 ? "pt-6 border-t border-border" : ""}
       >
         <div className="flex gap-0.5 text-yellow-500 mb-2 text-xs">
@@ -45,17 +43,14 @@ const SocialProof = () => (
             <span key={i}>★</span>
           ))}
         </div>
-        {/* MUDANÇA: text-zinc-400 -> text-muted-foreground */}
         <p className="text-xs text-muted-foreground italic leading-relaxed mb-3">
           {review.text}
         </p>
         <div className="flex items-center gap-3">
-          {/* MUDANÇA: bg-zinc-800 -> bg-muted | border-zinc-700 -> border-border | text-white -> text-foreground */}
           <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center text-[10px] font-bold text-foreground shadow-inner">
             {review.initials}
           </div>
           <div>
-            {/* MUDANÇA: text-white -> text-foreground */}
             <p className="text-foreground text-xs font-bold">{review.name}</p>
             <div className="flex items-center gap-1">
               <svg
@@ -70,7 +65,6 @@ const SocialProof = () => (
                   clipRule="evenodd"
                 />
               </svg>
-              {/* MUDANÇA: text-zinc-500 -> text-muted-foreground */}
               <span className="text-[10px] text-muted-foreground">
                 Cliente Verificado
               </span>
@@ -88,8 +82,6 @@ function CheckoutContent() {
 
   const [selectedSize, setSelectedSize] = useState("M");
   const [productPrice, setProductPrice] = useState(99.9);
-
-  // ESTADO DA QUANTIDADE ELEVADO PARA O PAI
   const [quantity, setQuantity] = useState(1);
 
   const [shippingMethod, setShippingMethod] = useState<"free" | "express">(
@@ -114,7 +106,12 @@ function CheckoutContent() {
     "credit" | "pix" | "boleto"
   >("credit");
 
-  const [timeLeft, setTimeLeft] = useState({ minutes: 10, seconds: 0 });
+  // --- CONFIGURAÇÃO DO TIMER (AJUSTE AQUI SE PRECISAR) ---
+  // DICA: Para testar rápido, use { minutes: 0, seconds: 10 }
+  const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 10 });
+
+  const [isExpired, setIsExpired] = useState(false);
+  const [showExpiredText, setShowExpiredText] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -132,18 +129,41 @@ function CheckoutContent() {
     }
   }, []);
 
+  // --- 1. LÓGICA APENAS DA CONTAGEM REGRESSIVA ---
   useEffect(() => {
+    // Se já expirou, não precisamos mais rodar este timer de decremento
+    if (isExpired) return;
+
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev.seconds === 0)
-          return prev.minutes === 0
-            ? { minutes: 0, seconds: 0 }
-            : { minutes: prev.minutes - 1, seconds: 59 };
+        // Checa se acabou
+        if (prev.seconds === 0 && prev.minutes === 0) {
+          setIsExpired(true); // Marca como expirado e para este timer
+          return prev;
+        }
+
+        // Decrementa normal
+        if (prev.seconds === 0) {
+          return { minutes: prev.minutes - 1, seconds: 59 };
+        }
         return { ...prev, seconds: prev.seconds - 1 };
       });
     }, 1000);
+
     return () => clearInterval(timer);
-  }, []);
+  }, [isExpired]); // Depende do isExpired para parar de rodar quando acabar
+
+  // --- 2. LÓGICA APENAS DA ALTERNÂNCIA (PISCA-PISCA) ---
+  useEffect(() => {
+    // Só roda se o tempo tiver acabado
+    if (isExpired) {
+      const toggleTimer = setInterval(() => {
+        setShowExpiredText((prev) => !prev);
+      }, 1500); // Alterna a cada 1.5 segundos (mais suave)
+
+      return () => clearInterval(toggleTimer);
+    }
+  }, [isExpired]);
 
   const goToStep = (step: number) => {
     if (step > currentStep) return;
@@ -153,10 +173,8 @@ function CheckoutContent() {
 
   const handleFinishCheckout = async () => {
     try {
-      // 1. Cálculos iniciais (mantendo a lógica antiga para o Front-end)
       const totalProductPrice = productPrice * quantity;
 
-      // 2. Prepara os dados para o Banco de Dados (API)
       const cartItem = {
         name: "Kit 2 Camisas Urban Flex Jeans",
         size: selectedSize,
@@ -172,7 +190,6 @@ function CheckoutContent() {
         totalAmount: totalProductPrice,
       };
 
-      // 3. CHAMA A API (Mantive a lógica da API que criamos antes para garantir funcionamento)
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
@@ -188,11 +205,11 @@ function CheckoutContent() {
           customer,
           address,
           paymentMethod,
-          shipping: shippingMethod, // Importante: A página de obrigado precisa disso
-          size: selectedSize, // Importante: A página de obrigado precisa disso
-          price: totalProductPrice, // Importante: Chama 'price' e não 'totalAmount'
+          shipping: shippingMethod,
+          size: selectedSize,
+          price: totalProductPrice,
           quantity: quantity,
-          orderId: data.orderId, // Adicionamos o ID real do banco
+          orderId: data.orderId,
         };
 
         sessionStorage.setItem(
@@ -212,27 +229,92 @@ function CheckoutContent() {
   };
 
   return (
-    // MUDANÇA: bg-zinc-950 -> bg-background | text-gray-300 -> text-muted-foreground
     <div className="min-h-screen bg-background text-muted-foreground font-sans selection:bg-sky-500/30 transition-colors duration-300">
       {/* HEADER + TIMER */}
-      {/* MUDANÇA: bg-zinc-950 -> bg-background */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm shadow-xl shadow-black/20">
-        {/* MUDANÇA: bg-[#0f172a] -> bg-card (Adaptativo) | border-zinc-800 -> border-border */}
-        <div className="bg-card text-center py-1.5 border-b border-border">
-          {/* MUDANÇA: text-white -> text-foreground */}
-          <p className="text-[10px] md:text-xs font-medium text-foreground flex items-center justify-center gap-2 animate-pulse">
-            <span>⏱️ Oferta expira em</span>
-            <span className="text-yellow-500 font-bold font-mono text-xs md:text-sm">
-              00:{String(timeLeft.minutes).padStart(2, "0")}:
-              {String(timeLeft.seconds).padStart(2, "0")}
-            </span>
-          </p>
+        <div className="bg-card text-center py-2 border-b border-border h-10 overflow-hidden relative">
+          {/* CONTAINER PARA OS TEXTOS ALTERNANTES */}
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* TEXTO NORMAL (ENQUANTO NÃO EXPIROU) */}
+            <div
+              className={`absolute flex items-center justify-center gap-2 transition-opacity duration-500 ease-in-out ${
+                isExpired ? "opacity-0 invisible" : "opacity-100 visible"
+              }`}
+            >
+              <p className="text-[10px] md:text-xs font-medium text-foreground flex items-center gap-2 animate-pulse">
+                {/* <span>⏱️ Oferta expira em</span> */}
+                <span className="flex items-center gap-1.5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-3.5 h-3.5 md:w-4 md:h-4 text-sky-500"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Oferta expira em
+                </span>
+                <span className="text-yellow-500 font-bold font-mono text-xs md:text-sm">
+                  00:{String(timeLeft.minutes).padStart(2, "0")}:
+                  {String(timeLeft.seconds).padStart(2, "0")}
+                </span>
+              </p>
+            </div>
+
+            {/* TEXTO DE ALERTA 1: "00:00:00" (QUANDO EXPIROU E showExpiredText é TRUE) */}
+            <div
+              className={`absolute transition-opacity duration-1000 ease-in-out ${
+                isExpired && showExpiredText
+                  ? "opacity-100 visible"
+                  : "opacity-0 invisible"
+              }`}
+            >
+              <span className="text-red-500/80 font-mono font-bold text-xs md:text-sm tracking-widest">
+                00:00:00
+              </span>
+            </div>
+
+            {/* TEXTO DE ALERTA 2: FRASE DE IMPACTO (QUANDO EXPIROU E showExpiredText é FALSE) */}
+            <div
+              className={`absolute transition-opacity duration-1000 ease-in-out ${
+                isExpired && !showExpiredText
+                  ? "opacity-100 visible"
+                  : "opacity-0 invisible"
+              }`}
+            >
+              <span className="flex items-center justify-center gap-1.5 text-zinc-600 font-black uppercase tracking-wide text-[10px] md:text-xs">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 mb-0.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.007v.008H12v-.008z"
+                  />
+                </svg>
+                Última chamada para aproveitar a oferta!
+              </span>
+              {/* <span className="text-zinc-600 font-bold uppercase tracking-wide text-[10px] md:text-xs">
+                ⚠️ Última chamada para aproveitar a oferta!
+              </span> */}
+            </div>
+          </div>
         </div>
 
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-14 md:h-20 flex items-center justify-between">
           <Link
             href="/"
-            // MUDANÇA: text-white -> text-foreground
             className="font-alt text-xl md:text-3xl font-black text-foreground tracking-tighter hover:opacity-90 transition-opacity flex items-center gap-1"
           >
             URBAN<span className="text-sky-500">FLEX</span>
@@ -240,7 +322,6 @@ function CheckoutContent() {
             <span className="text-sky-500">.</span>
           </Link>
 
-          {/* MUDANÇA: text-gray-400 -> text-muted-foreground */}
           <div className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-muted-foreground opacity-80 text-right leading-tight">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +345,6 @@ function CheckoutContent() {
       </header>
 
       {/* TRILHA DE PROGRESSO */}
-      {/* MUDANÇA: bg-zinc-900/50 -> bg-background/80 | border-zinc-800 -> border-border */}
       <div className="md:hidden grid grid-cols-3 px-6 py-3 bg-background/80 border-b border-border mb-2 sticky top-[85px] z-40 backdrop-blur-md">
         {[1, 2, 3].map((step) => (
           <div
@@ -275,7 +355,6 @@ function CheckoutContent() {
             onClick={() => step < currentStep && goToStep(step)}
           >
             <div
-              // MUDANÇA: bg-zinc-800 -> bg-muted (Inativo) | bg-white -> bg-foreground (Ativo) | text-black -> text-background (Ativo)
               className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
                 currentStep === step
                   ? "bg-foreground text-background scale-110 shadow-lg shadow-black/10"
@@ -347,8 +426,8 @@ function CheckoutContent() {
             paymentMethod={paymentMethod}
             selectedSize={selectedSize}
             productPrice={productPrice}
-            quantity={quantity} // Passando quantidade para o filho
-            setQuantity={setQuantity} // Passando setQuantity para o filho
+            quantity={quantity}
+            setQuantity={setQuantity}
           />
           <div className="hidden md:block mt-6">
             <SocialProof />
@@ -357,10 +436,8 @@ function CheckoutContent() {
       </main>
 
       {/* FOOTER */}
-      {/* MUDANÇA: border-zinc-900 -> border-border | bg-zinc-950 -> bg-background */}
       <footer className="py-8 md:py-10 border-t border-border text-center bg-background mt-auto">
         <div className="max-w-4xl mx-auto px-6">
-          {/* MUDANÇA: text-zinc-600 -> text-muted-foreground */}
           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-4">
             Formas de Pagamento
           </p>
@@ -372,7 +449,6 @@ function CheckoutContent() {
             <img src="/card-diners.svg" alt="" />
             <img className="w-20 h-auto" src="/pix.png" alt="" />
           </div>
-          {/* MUDANÇA: text-zinc-700 -> text-muted-foreground */}
           <p className="text-[10px] text-muted-foreground">
             URBAN FLEX ® 2025. Todos os direitos reservados.
           </p>
@@ -386,7 +462,6 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        // MUDANÇA: bg-zinc-950 -> bg-background | text-white -> text-foreground
         <div className="min-h-screen bg-background flex items-center justify-center text-foreground">
           Carregando...
         </div>

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useModal } from "@/context/ModalContext";
 import { useState } from "react";
-import TrackOrderModal from "@/components/TrackOrderModal"; // IMPORTANTE: Verifique se o caminho e nome estão corretos
+import TrackOrderModal from "@/components/TrackOrderModal";
 
 export default function Header() {
-  const { openModal } = useModal(); // Modal de Compra (Vídeo/Checkout)
+  const { openModal } = useModal();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Estado para controlar o modal de rastreio
@@ -39,26 +39,27 @@ export default function Header() {
 
           {/* MENU DESKTOP */}
           <nav className="hidden md:flex items-center gap-8">
-            <a
-              href="#colecao"
+            {/* ALTERADO: De <a> para <Link> e adicionado / antes do # */}
+            <Link
+              href="/#colecao"
               className="text-sm font-bold text-gray-500 hover:text-[#0f172a] transition-colors uppercase tracking-wide cursor-pointer"
             >
               Coleção
-            </a>
-            <a
-              href="#tecnologia"
+            </Link>
+            <Link
+              href="/#tecnologia"
               className="text-sm font-bold text-gray-500 hover:text-[#0f172a] transition-colors uppercase tracking-wide cursor-pointer"
             >
               Tecnologia
-            </a>
-            <a
-              href="#depoimentos"
+            </Link>
+            <Link
+              href="/#depoimentos"
               className="text-sm font-bold text-gray-500 hover:text-[#0f172a] transition-colors uppercase tracking-wide cursor-pointer"
             >
               Depoimentos
-            </a>
+            </Link>
 
-            {/* --- NOVO LINK: RASTREAR (DESKTOP) --- */}
+            {/* --- LINK RASTREAR (DESKTOP) --- */}
             <button
               onClick={() => setIsTrackModalOpen(true)}
               className="flex items-center gap-1.5 text-sm font-bold text-sky-500 hover:text-sky-600 transition-colors uppercase tracking-wide cursor-pointer group"
@@ -79,7 +80,6 @@ export default function Header() {
               </svg>
               Rastrear
             </button>
-            {/* -------------------------------------- */}
 
             <button
               onClick={openModal}
@@ -137,7 +137,7 @@ export default function Header() {
             }`}
           >
             <div className="flex flex-col pt-24 pb-8 px-6 gap-6">
-              {/* --- NOVO LINK: RASTREAR (MOBILE) --- */}
+              {/* --- LINK RASTREAR (MOBILE) --- */}
               <button
                 onClick={() => {
                   closeMenu();
@@ -164,34 +164,34 @@ export default function Header() {
                 </div>
                 <span className="text-[#38bdf8]">→</span>
               </button>
-              {/* ------------------------------------ */}
 
-              <a
-                href="#colecao"
+              {/* ALTERADO: De <a> para <Link> e adicionado / antes do # */}
+              <Link
+                href="/#colecao"
                 onClick={closeMenu}
                 className="text-lg font-bold text-[#0f172a] border-b border-gray-100 pb-4 flex justify-between items-center"
               >
                 Coleção
                 <span className="text-[#38bdf8]">→</span>
-              </a>
+              </Link>
 
-              <a
-                href="#tecnologia"
+              <Link
+                href="/#tecnologia"
                 onClick={closeMenu}
                 className="text-lg font-bold text-[#0f172a] border-b border-gray-100 pb-4 flex justify-between items-center"
               >
                 Tecnologia
                 <span className="text-[#38bdf8]">→</span>
-              </a>
+              </Link>
 
-              <a
-                href="#depoimentos"
+              <Link
+                href="/#depoimentos"
                 onClick={closeMenu}
                 className="text-lg font-bold text-[#0f172a] border-b border-gray-100 pb-4 flex justify-between items-center"
               >
                 Depoimentos
                 <span className="text-[#38bdf8]">→</span>
-              </a>
+              </Link>
 
               <button
                 onClick={() => {
@@ -207,7 +207,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* RENDERIZA O MODAL FORA DO HEADER (PORTAL SERIA MELHOR, MAS AQUI FUNCIONA BEM) */}
       <TrackOrderModal
         isOpen={isTrackModalOpen}
         onClose={() => setIsTrackModalOpen(false)}
