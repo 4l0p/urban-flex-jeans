@@ -26,7 +26,8 @@ export default function Testimonials() {
   return (
     <section
       id="depoimentos"
-      className="w-full bg-black py-24 px-6 relative border-t border-zinc-900"
+      // MUDANÇA: bg-black -> bg-background | border-zinc-900 -> border-border
+      className="w-full bg-background py-24 px-6 relative border-t border-border transition-colors duration-300"
     >
       {/* Background Decorativo */}
       <div className="absolute right-0 top-1/4 w-96 h-96 bg-blue-900/10 rounded-full blur-[120px] pointer-events-none" />
@@ -38,7 +39,8 @@ export default function Testimonials() {
             <span className="text-sky-500 font-bold tracking-widest uppercase text-sm">
               Feedback
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mt-2 leading-tight">
+            {/* MUDANÇA: text-white -> text-foreground */}
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mt-2 leading-tight">
               Aprovado por quem <br /> entende de{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
                 Estilo.
@@ -55,7 +57,8 @@ export default function Testimonials() {
               <span>★</span>
               <span>★</span>
             </div>
-            <p className="text-gray-400 text-sm font-medium">
+            {/* MUDANÇA: text-gray-400 -> text-muted-foreground */}
+            <p className="text-muted-foreground text-sm font-medium">
               Baseado em +1.200 avaliações de clientes verificados.
             </p>
           </div>
@@ -66,7 +69,8 @@ export default function Testimonials() {
           {reviews.map((review, index) => (
             <div
               key={index}
-              className="bg-zinc-900/40 backdrop-blur-sm p-8 rounded-2xl border border-zinc-800 hover:border-sky-500/50 transition-all duration-300 group hover:-translate-y-2"
+              // MUDANÇA: bg-zinc-900/40 -> bg-card | border-zinc-800 -> border-border
+              className="bg-card backdrop-blur-sm p-8 rounded-2xl border border-border hover:border-sky-500/50 transition-all duration-300 group hover:-translate-y-2 shadow-sm"
             >
               {/* Estrelas */}
               <div className="flex text-yellow-500 mb-6 text-sm">
@@ -76,27 +80,33 @@ export default function Testimonials() {
               </div>
 
               {/* Título do Review */}
-              <h3 className="text-white font-bold text-lg mb-3 group-hover:text-sky-400 transition-colors">
+              {/* MUDANÇA: text-white -> text-foreground */}
+              <h3 className="text-foreground font-bold text-lg mb-3 group-hover:text-sky-400 transition-colors">
                 "{review.title}"
               </h3>
 
               {/* Texto */}
-              <p className="text-gray-400 text-sm leading-relaxed mb-8">
+              {/* MUDANÇA: text-gray-400 -> text-muted-foreground */}
+              <p className="text-muted-foreground text-sm leading-relaxed mb-8">
                 {review.text}
               </p>
 
               {/* Autor */}
-              <div className="flex items-center gap-3 border-t border-zinc-800 pt-6">
+              {/* MUDANÇA: border-zinc-800 -> border-border */}
+              <div className="flex items-center gap-3 border-t border-border pt-6">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-black flex items-center justify-center text-white font-bold text-xs">
                   {review.name.charAt(0)}
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm">{review.name}</p>
+                  {/* MUDANÇA: text-white -> text-foreground */}
+                  <p className="text-foreground font-bold text-sm">
+                    {review.name}
+                  </p>
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-sky-500 font-semibold">
                       {review.role}
                     </span>
-                    <span className="text-zinc-600">•</span>
+                    <span className="text-muted-foreground">•</span>
                     <span className="text-[10px] text-green-500 uppercase tracking-wide font-bold">
                       Compra Verificada
                     </span>

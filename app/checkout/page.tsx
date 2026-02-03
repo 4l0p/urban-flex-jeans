@@ -32,26 +32,31 @@ const reviews = [
 ];
 
 const SocialProof = () => (
-  <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 md:p-6 shadow-lg opacity-80 hover:opacity-100 transition-opacity mt-6 md:mt-0 space-y-6">
+  // MUDANÇA: bg-zinc-900 -> bg-card | border-zinc-800 -> border-border
+  <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-lg opacity-80 hover:opacity-100 transition-opacity mt-6 md:mt-0 space-y-6">
     {reviews.map((review, index) => (
       <div
         key={index}
-        className={index !== 0 ? "pt-6 border-t border-zinc-800" : ""}
+        // MUDANÇA: border-zinc-800 -> border-border
+        className={index !== 0 ? "pt-6 border-t border-border" : ""}
       >
         <div className="flex gap-0.5 text-yellow-500 mb-2 text-xs">
           {Array.from({ length: review.stars }).map((_, i) => (
             <span key={i}>★</span>
           ))}
         </div>
-        <p className="text-xs text-zinc-400 italic leading-relaxed mb-3">
+        {/* MUDANÇA: text-zinc-400 -> text-muted-foreground */}
+        <p className="text-xs text-muted-foreground italic leading-relaxed mb-3">
           {review.text}
         </p>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-white shadow-inner">
+          {/* MUDANÇA: bg-zinc-800 -> bg-muted | border-zinc-700 -> border-border | text-white -> text-foreground */}
+          <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center text-[10px] font-bold text-foreground shadow-inner">
             {review.initials}
           </div>
           <div>
-            <p className="text-white text-xs font-bold">{review.name}</p>
+            {/* MUDANÇA: text-white -> text-foreground */}
+            <p className="text-foreground text-xs font-bold">{review.name}</p>
             <div className="flex items-center gap-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +70,8 @@ const SocialProof = () => (
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-[10px] text-zinc-500">
+              {/* MUDANÇA: text-zinc-500 -> text-muted-foreground */}
+              <span className="text-[10px] text-muted-foreground">
                 Cliente Verificado
               </span>
             </div>
@@ -87,7 +93,7 @@ function CheckoutContent() {
   const [quantity, setQuantity] = useState(1);
 
   const [shippingMethod, setShippingMethod] = useState<"free" | "express">(
-    "free"
+    "free",
   );
   const [customer, setCustomer] = useState({
     name: "",
@@ -145,33 +151,78 @@ function CheckoutContent() {
   };
   const nextStep = () => setCurrentStep((prev) => prev + 1);
 
-  // --- CORREÇÃO AQUI ---
-  const handleFinishCheckout = () => {
-    // Calcula o preço total baseado na quantidade
-    const totalProductPrice = productPrice * quantity;
+  const handleFinishCheckout = async () => {
+    try {
+      // 1. Cálculos iniciais (mantendo a lógica antiga para o Front-end)
+      const totalProductPrice = productPrice * quantity;
 
-    const finalOrderData = {
-      customer,
-      address,
-      paymentMethod,
-      shipping: shippingMethod, // RENOMEADO para 'shipping' para corresponder à página Thank You
-      size: selectedSize,
-      price: totalProductPrice, // Salva o preço TOTAL dos produtos
-      quantity: quantity, // Salva a quantidade
-    };
+      // 2. Prepara os dados para o Banco de Dados (API)
+      const cartItem = {
+        name: "Kit 2 Camisas Urban Flex Jeans",
+        size: selectedSize,
+        quantity: quantity,
+        price: productPrice,
+      };
 
-    sessionStorage.setItem("checkoutData", JSON.stringify(finalOrderData));
-    router.push("/checkout/thank-you");
+      const payload = {
+        customer,
+        address,
+        cart: [cartItem],
+        paymentMethod,
+        totalAmount: totalProductPrice,
+      };
+
+      // 3. CHAMA A API (Mantive a lógica da API que criamos antes para garantir funcionamento)
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const dataForThankYouPage = {
+          customer,
+          address,
+          paymentMethod,
+          shipping: shippingMethod, // Importante: A página de obrigado precisa disso
+          size: selectedSize, // Importante: A página de obrigado precisa disso
+          price: totalProductPrice, // Importante: Chama 'price' e não 'totalAmount'
+          quantity: quantity,
+          orderId: data.orderId, // Adicionamos o ID real do banco
+        };
+
+        sessionStorage.setItem(
+          "checkoutData",
+          JSON.stringify(dataForThankYouPage),
+        );
+
+        router.push("/checkout/thank-you");
+      } else {
+        alert("Houve um erro ao processar seu pedido. Tente novamente.");
+        console.error("Erro API:", data.error);
+      }
+    } catch (error) {
+      console.error("Erro de conexão:", error);
+      alert("Erro ao conectar com o servidor.");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-gray-300 font-sans selection:bg-sky-500/30">
+    // MUDANÇA: bg-zinc-950 -> bg-background | text-gray-300 -> text-muted-foreground
+    <div className="min-h-screen bg-background text-muted-foreground font-sans selection:bg-sky-500/30 transition-colors duration-300">
       {/* HEADER + TIMER */}
-      <header className="sticky top-0 z-50 bg-zinc-950 shadow-xl shadow-black/20">
-        <div className="bg-[#0f172a] text-center py-1.5 border-b border-zinc-800">
-          <p className="text-[10px] md:text-xs font-medium text-white flex items-center justify-center gap-2 animate-pulse">
+      {/* MUDANÇA: bg-zinc-950 -> bg-background */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm shadow-xl shadow-black/20">
+        {/* MUDANÇA: bg-[#0f172a] -> bg-card (Adaptativo) | border-zinc-800 -> border-border */}
+        <div className="bg-card text-center py-1.5 border-b border-border">
+          {/* MUDANÇA: text-white -> text-foreground */}
+          <p className="text-[10px] md:text-xs font-medium text-foreground flex items-center justify-center gap-2 animate-pulse">
             <span>⏱️ Oferta expira em</span>
-            <span className="text-yellow-400 font-bold font-mono text-xs md:text-sm">
+            <span className="text-yellow-500 font-bold font-mono text-xs md:text-sm">
               00:{String(timeLeft.minutes).padStart(2, "0")}:
               {String(timeLeft.seconds).padStart(2, "0")}
             </span>
@@ -181,14 +232,16 @@ function CheckoutContent() {
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-14 md:h-20 flex items-center justify-between">
           <Link
             href="/"
-            className="font-alt text-xl md:text-3xl font-black text-white tracking-tighter hover:opacity-90 transition-opacity flex items-center gap-1"
+            // MUDANÇA: text-white -> text-foreground
+            className="font-alt text-xl md:text-3xl font-black text-foreground tracking-tighter hover:opacity-90 transition-opacity flex items-center gap-1"
           >
             URBAN<span className="text-sky-500">FLEX</span>
             <span className="hidden md:inline">JEANS</span>{" "}
             <span className="text-sky-500">.</span>
           </Link>
 
-          <div className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-400 opacity-80 text-right leading-tight">
+          {/* MUDANÇA: text-gray-400 -> text-muted-foreground */}
+          <div className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-muted-foreground opacity-80 text-right leading-tight">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -211,7 +264,8 @@ function CheckoutContent() {
       </header>
 
       {/* TRILHA DE PROGRESSO */}
-      <div className="md:hidden grid grid-cols-3 px-6 py-3 bg-zinc-900/50 border-b border-zinc-800 mb-2 sticky top-[85px] z-40 backdrop-blur-md">
+      {/* MUDANÇA: bg-zinc-900/50 -> bg-background/80 | border-zinc-800 -> border-border */}
+      <div className="md:hidden grid grid-cols-3 px-6 py-3 bg-background/80 border-b border-border mb-2 sticky top-[85px] z-40 backdrop-blur-md">
         {[1, 2, 3].map((step) => (
           <div
             key={step}
@@ -221,12 +275,13 @@ function CheckoutContent() {
             onClick={() => step < currentStep && goToStep(step)}
           >
             <div
+              // MUDANÇA: bg-zinc-800 -> bg-muted (Inativo) | bg-white -> bg-foreground (Ativo) | text-black -> text-background (Ativo)
               className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
                 currentStep === step
-                  ? "bg-white text-black scale-110 shadow-lg shadow-white/20"
+                  ? "bg-foreground text-background scale-110 shadow-lg shadow-black/10"
                   : step < currentStep
-                  ? "bg-green-500 text-white cursor-pointer"
-                  : "bg-zinc-800 text-gray-500"
+                    ? "bg-green-500 text-white cursor-pointer"
+                    : "bg-muted text-muted-foreground"
               }`}
             >
               {step < currentStep ? "✓" : step}
@@ -302,9 +357,11 @@ function CheckoutContent() {
       </main>
 
       {/* FOOTER */}
-      <footer className="py-8 md:py-10 border-t border-zinc-900 text-center bg-zinc-950 mt-auto">
+      {/* MUDANÇA: border-zinc-900 -> border-border | bg-zinc-950 -> bg-background */}
+      <footer className="py-8 md:py-10 border-t border-border text-center bg-background mt-auto">
         <div className="max-w-4xl mx-auto px-6">
-          <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-4">
+          {/* MUDANÇA: text-zinc-600 -> text-muted-foreground */}
+          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-4">
             Formas de Pagamento
           </p>
           <div className="flex justify-center gap-3 opacity-50 mb-6 md:mb-8 hover:opacity-80">
@@ -315,7 +372,8 @@ function CheckoutContent() {
             <img src="/card-diners.svg" alt="" />
             <img className="w-20 h-auto" src="/pix.png" alt="" />
           </div>
-          <p className="text-[10px] text-zinc-700">
+          {/* MUDANÇA: text-zinc-700 -> text-muted-foreground */}
+          <p className="text-[10px] text-muted-foreground">
             URBAN FLEX ® 2025. Todos os direitos reservados.
           </p>
         </div>
@@ -328,7 +386,8 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-white">
+        // MUDANÇA: bg-zinc-950 -> bg-background | text-white -> text-foreground
+        <div className="min-h-screen bg-background flex items-center justify-center text-foreground">
           Carregando...
         </div>
       }

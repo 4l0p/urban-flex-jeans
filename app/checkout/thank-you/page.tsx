@@ -25,7 +25,8 @@ export default function ThankYouPage() {
     !sessionStorage.getItem("checkoutData")
   ) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white">
+      // MUDANÇA: bg-zinc-950 -> bg-background | text-white -> text-foreground
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground">
         <p>Carregando pedido...</p>
         <Link href="/" className="text-sky-500 hover:underline mt-4 text-sm">
           Voltar para a loja
@@ -48,26 +49,26 @@ export default function ThankYouPage() {
     price: 99.9,
   };
 
-  // --- LÓGICA DE CÁLCULO CORRIGIDA ---
-  // Verifica se é Pix OU Boleto para aplicar desconto
+  // --- LÓGICA DE CÁLCULO ---
   const hasDiscount =
     data.paymentMethod === "pix" || data.paymentMethod === "boleto";
 
-  // Define o valor do produto (com ou sem desconto)
   const productFinalPrice = hasDiscount ? data.price * 0.95 : data.price;
 
-  // Define o valor do frete
   const shippingCost = data.shipping === "free" ? 0 : 14.9;
 
-  // Valor Final
   const totalValue = productFinalPrice + shippingCost;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-300 font-sans selection:bg-green-500/30 pb-20">
-      <header className="h-20 border-b border-zinc-800 flex items-center justify-center bg-zinc-950 sticky top-0 z-50">
+    // MUDANÇA: bg-zinc-950 -> bg-background | text-zinc-300 -> text-muted-foreground
+    <div className="min-h-screen bg-background text-muted-foreground font-sans selection:bg-green-500/30 pb-20 transition-colors duration-300">
+      {/* HEADER */}
+      {/* MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
+      <header className="h-20 border-b border-border flex items-center justify-center bg-background sticky top-0 z-50">
         <Link
           href="/"
-          className="font-alt text-2xl font-black text-white tracking-tighter"
+          // MUDANÇA: text-white -> text-foreground
+          className="font-alt text-2xl font-black text-foreground tracking-tighter"
         >
           URBAN<span className="text-sky-500">FLEX</span>{" "}
           <span className="text-sky-500">.</span>
@@ -82,7 +83,7 @@ export default function ThankYouPage() {
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={3}
-              stroke="black"
+              stroke="black" // Ícone preto para contrastar com o verde
               className="w-10 h-10"
             >
               <path
@@ -92,21 +93,26 @@ export default function ThankYouPage() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">
+          {/* MUDANÇA: text-white -> text-foreground */}
+          <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 tracking-tight">
             Pedido Confirmado!
           </h1>
-          <p className="text-zinc-400 text-sm md:text-base max-w-md mx-auto">
+          {/* MUDANÇA: text-zinc-400 -> text-muted-foreground */}
+          <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
             Obrigado pela compra. Enviamos um e-mail de confirmação para você.
           </p>
-          <div className="mt-6 inline-block bg-zinc-900 border border-zinc-800 rounded-full px-6 py-2 text-sm font-mono text-zinc-300">
-            Pedido: <span className="text-white font-bold">{orderId}</span>
+          {/* MUDANÇA: bg-zinc-900 -> bg-muted/20 | border-zinc-800 -> border-border | text-zinc-300 -> text-muted-foreground */}
+          <div className="mt-6 inline-block bg-muted/20 border border-border rounded-full px-6 py-2 text-sm font-mono text-muted-foreground">
+            {/* MUDANÇA: text-white -> text-foreground */}
+            Pedido: <span className="text-foreground font-bold">{orderId}</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150">
           {/* CARTÃO DO PRODUTO */}
-          <section className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:col-span-2">
-            <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+          {/* MUDANÇA: bg-zinc-900/50 -> bg-card | border-zinc-800 -> border-border */}
+          <section className="bg-card border border-border rounded-2xl p-6 md:col-span-2">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -122,7 +128,8 @@ export default function ThankYouPage() {
               Resumo da Compra
             </h2>
             <div className="flex gap-4 items-start">
-              <div className="w-20 h-24 bg-zinc-800 rounded-lg overflow-hidden shrink-0 border border-zinc-700">
+              {/* MUDANÇA: bg-zinc-800 -> bg-muted | border-zinc-700 -> border-border */}
+              <div className="w-20 h-24 bg-muted rounded-lg overflow-hidden shrink-0 border border-border">
                 <img
                   src="/kit_img_checkout.png"
                   className="w-full h-full object-cover"
@@ -130,19 +137,23 @@ export default function ThankYouPage() {
                 />
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-bold text-sm mb-1">
+                {/* MUDANÇA: text-white -> text-foreground */}
+                <h3 className="text-foreground font-bold text-sm mb-1">
                   Kit 2 Camisas Urban Flex Jeans
                 </h3>
-                <p className="text-xs text-zinc-400 mb-2">
-                  Tamanho:{" "}
-                  <span className="text-zinc-200 font-medium">
+                {/* MUDANÇA: text-zinc-400 -> text-muted-foreground */}
+                <p className="text-xs text-muted-foreground mb-2">
+                  Tamanho: {/* MUDANÇA: text-zinc-200 -> text-foreground */}
+                  <span className="text-foreground font-medium">
                     {data.size || "M"}
                   </span>
                 </p>
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-800/50">
-                  <span className="text-xs text-zinc-500">Total Pago</span>
+                {/* MUDANÇA: border-zinc-800/50 -> border-border/50 */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
+                  <span className="text-xs text-muted-foreground">
+                    Total Pago
+                  </span>
                   <span className="text-green-500 font-bold text-lg">
-                    {/* Exibe o valor calculado corretamente */}
                     {totalValue.toLocaleString("pt-BR", {
                       style: "currency",
                       currency: "BRL",
@@ -154,8 +165,9 @@ export default function ThankYouPage() {
           </section>
 
           {/* DETALHES DE ENTREGA */}
-          <section className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-            <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+          {/* MUDANÇA: bg-zinc-900/50 -> bg-card | border-zinc-800 -> border-border */}
+          <section className="bg-card border border-border rounded-2xl p-6">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -168,17 +180,20 @@ export default function ThankYouPage() {
               </svg>
               Endereço de Entrega
             </h2>
-            <div className="space-y-1 text-sm text-zinc-300">
-              <p className="font-bold text-white">
+            {/* MUDANÇA: text-zinc-300 -> text-muted-foreground */}
+            <div className="space-y-1 text-sm text-muted-foreground">
+              {/* MUDANÇA: text-white -> text-foreground */}
+              <p className="font-bold text-foreground">
                 {data.address?.street}, {data.address?.number}
               </p>
               <p>{data.address?.neighborhood}</p>
               <p>
                 {data.address?.city} - {data.address?.state}
               </p>
-              <p className="text-zinc-500 text-xs mt-2 pt-2 border-t border-zinc-800">
-                Método:{" "}
-                <span className="text-zinc-300">
+              {/* MUDANÇA: border-zinc-800 -> border-border */}
+              <p className="text-zinc-500 text-xs mt-2 pt-2 border-t border-border">
+                Método: {/* MUDANÇA: text-zinc-300 -> text-foreground */}
+                <span className="text-foreground">
                   {data.shipping === "express"
                     ? "Expresso (2-3 dias)"
                     : "Grátis (5-7 dias)"}
@@ -188,8 +203,9 @@ export default function ThankYouPage() {
           </section>
 
           {/* FORMA DE PAGAMENTO */}
-          <section className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-            <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+          {/* MUDANÇA: bg-zinc-900/50 -> bg-card | border-zinc-800 -> border-border */}
+          <section className="bg-card border border-border rounded-2xl p-6">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -209,10 +225,12 @@ export default function ThankYouPage() {
                 <>
                   <img src="/pix.png" alt="Pix" className="h-6 opacity-80" />
                   <div>
-                    <p className="text-white text-sm font-bold">
+                    {/* MUDANÇA: text-white -> text-foreground */}
+                    <p className="text-foreground text-sm font-bold">
                       Pix (Aprovado)
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    {/* MUDANÇA: text-zinc-500 -> text-muted-foreground */}
+                    <p className="text-xs text-muted-foreground">
                       Pagamento instantâneo
                     </p>
                   </div>
@@ -220,14 +238,17 @@ export default function ThankYouPage() {
               )}
               {data.paymentMethod === "credit" && (
                 <>
-                  <div className="w-10 h-7 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center">
-                    <div className="w-6 h-4 bg-zinc-600/50 rounded-sm"></div>
+                  {/* MUDANÇA: bg-zinc-800 -> bg-muted | border-zinc-700 -> border-border */}
+                  <div className="w-10 h-7 bg-muted rounded border border-border flex items-center justify-center">
+                    {/* MUDANÇA: bg-zinc-600/50 -> bg-muted-foreground/30 */}
+                    <div className="w-6 h-4 bg-muted-foreground/30 rounded-sm"></div>
                   </div>
                   <div>
-                    <p className="text-white text-sm font-bold">
+                    {/* MUDANÇA: text-white -> text-foreground */}
+                    <p className="text-foreground text-sm font-bold">
                       Cartão de Crédito
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       Final **** (Processado)
                     </p>
                   </div>
@@ -235,14 +256,16 @@ export default function ThankYouPage() {
               )}
               {data.paymentMethod === "boleto" && (
                 <>
-                  <div className="w-10 h-10 bg-zinc-800 rounded flex items-center justify-center">
+                  {/* MUDANÇA: bg-zinc-800 -> bg-muted */}
+                  <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="w-6 h-6 text-white"
+                      // MUDANÇA: text-white -> text-foreground
+                      className="w-6 h-6 text-foreground"
                     >
                       <path
                         strokeLinecap="round"
@@ -257,10 +280,11 @@ export default function ThankYouPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-white text-sm font-bold">
+                    {/* MUDANÇA: text-white -> text-foreground */}
+                    <p className="text-foreground text-sm font-bold">
                       Boleto Bancário
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       Aguardando pagamento
                     </p>
                     <button className="text-[10px] text-sky-500 hover:text-sky-400 font-bold mt-1 uppercase tracking-wide">
@@ -276,7 +300,9 @@ export default function ThankYouPage() {
         <div className="mt-10 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
           <Link
             href="/"
-            className="bg-white hover:bg-zinc-200 text-black font-bold py-4 px-10 rounded-full transition-all inline-flex items-center gap-2 transform hover:scale-105 shadow-lg shadow-white/10"
+            // MUDANÇA: bg-white -> bg-foreground | text-black -> text-background
+            // MUDANÇA: hover:bg-zinc-200 -> hover:opacity-90
+            className="bg-foreground hover:opacity-90 text-background font-bold py-4 px-10 rounded-full transition-all inline-flex items-center gap-2 transform hover:scale-105 shadow-lg shadow-black/10 dark:shadow-white/10"
           >
             VOLTAR PARA A LOJA
           </Link>

@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  /* Aqui criamos a animação personalizada */
+  /* --- 1. ANIMAÇÕES --- */
   --animate-slide-in-right: slideIn 0.3s ease-out;
+  --animate-fade-in: fadeIn 0.5s ease-out;
 
   @keyframes slideIn {
     0% {
@@ -12,26 +13,108 @@
       transform: translateX(0);
     }
   }
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* --- 2. REGISTRANDO AS CORES DINÂMICAS (API DO TEMA) --- */
+
+  /* Fundo da página */
+  --color-background: var(--background);
+  /* Texto Principal */
+  --color-foreground: var(--foreground);
+
+  /* Elementos Secundários (Ex: Fundo dos ícones que estava dando erro) */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Cartões e Containers */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  /* Textos de apoio (Cinza mais fraco) */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Bordas e Inputs */
+  --color-border: var(--border);
+  --color-input: var(--input);
+
+  /* Cores de Destaque (Azul/Sky) mantendo a referência fixa por enquanto ou dinâmica se quiser */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 }
 
-/* Configurações básicas de cores e fontes */
+/* --- 3. DEFININDO OS VALORES (A MÁGICA ACONTECE AQUI) --- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ==> TEMA CLARO (LIGHT MODE) <== */
+  /* Ajustado para Zinc (neutro) para bater com a identidade da marca */
+  --background: #ffffff; /* Branco Puro */
+  --foreground: #09090b; /* Zinc 950 (Preto Absoluto) */
+
+  --card: #ffffff; /* Branco */
+  --card-foreground: #09090b;
+
+  --secondary: #f4f4f5; /* Zinc 100 (Cinza Gelo - Ótimo para fundo de ícones no light) */
+  --secondary-foreground: #18181b;
+
+  --muted: #f4f4f5; /* Zinc 100 */
+  --muted-foreground: #71717a; /* Zinc 500 (Legível no branco) */
+
+  --border: #e4e4e7; /* Zinc 200 (Borda suave) */
+  --input: #ffffff;
+
+  --primary: #0ea5e9; /* Sky 500 */
+  --primary-foreground: #ffffff;
 }
 
+/* ==> TEMA ESCURO (DARK MODE - PRESERVADO) <== */
+.dark {
+  --background: #09090b; /* Zinc 950 */
+  --foreground: #f4f4f5; /* Zinc 100 (Branco Suave) */
+
+  --card: #18181b; /* Zinc 900 (Original dos seus cards) */
+  --card-foreground: #f4f4f5;
+
+  --secondary: #27272a; /* Zinc 800 (Original dos fundos de ícones) */
+  --secondary-foreground: #f4f4f5;
+
+  --muted: #27272a; /* Zinc 800 */
+  --muted-foreground: #a1a1aa; /* Zinc 400 */
+
+  --border: #27272a; /* Zinc 800 */
+  --input: #09090b;
+
+  --primary: #0ea5e9; /* Sky 500 */
+  --primary-foreground: #ffffff;
+}
+
+/* Configurações globais */
 html {
   scroll-behavior: smooth;
 }
 
-/* --- CONFIGURAÇÃO DE FONTES (V4) --- */
-
-/* Aplica Inter como padrão no corpo do site */
 body {
+  /* Garante que a fonte venha do layout.tsx */
   font-family: var(--font-inter), sans-serif;
+
+  /* Aplica as variáveis definidas acima */
+  background-color: var(--background);
+  color: var(--foreground);
+
+  /* Transição suave ao trocar de tema */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
-/* Aplica Montserrat automaticamente em Títulos e Botões */
+/* Títulos e Botões */
 h1,
 h2,
 h3,
@@ -40,14 +123,13 @@ h5,
 h6,
 button {
   font-family: var(--font-montserrat), sans-serif;
-  font-weight: 700; /* Força negrito nos títulos/botões */
+  font-weight: 700;
 }
 
-/* Classe utilitária caso queira forçar Montserrat em outro lugar */
 .font-alt {
   font-family: var(--font-montserrat), sans-serif;
 }
 
 button {
-  @apply cursor-pointer;
+  cursor: pointer;
 }

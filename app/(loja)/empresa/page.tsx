@@ -1,12 +1,14 @@
 export default function EmpresaPage() {
   return (
-    <main className="bg-zinc-950 min-h-screen pt-32 pb-20 text-gray-300">
+    // CAMADA 1: Variáveis Globais (bg-background, text-muted-foreground)
+    <main className="bg-background min-h-screen pt-32 pb-20 text-muted-foreground transition-colors duration-300">
       {/* Título Principal */}
       <section className="max-w-4xl mx-auto px-6 text-center mb-16">
         <span className="text-sky-500 font-bold tracking-[0.2em] uppercase text-sm font-alt">
           Quem Somos
         </span>
-        <h1 className="text-4xl md:text-6xl font-black text-white mt-4 font-alt tracking-tight">
+        {/* Título: Preto (Light) / Branco (Dark) */}
+        <h1 className="text-4xl md:text-6xl font-black text-foreground mt-4 font-alt tracking-tight">
           A EVOLUÇÃO DO <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
             ESTILO MASCULINO
@@ -16,11 +18,11 @@ export default function EmpresaPage() {
       </section>
 
       {/* Texto de Apresentação */}
-      <section className="max-w-3xl mx-auto px-6 mb-20 space-y-6 text-lg leading-relaxed text-zinc-400">
+      <section className="max-w-3xl mx-auto px-6 mb-20 space-y-6 text-lg leading-relaxed text-muted-foreground">
         <p>
-          A <strong className="text-white">Urban Flex</strong> nasceu de uma
-          necessidade real: o homem moderno não deveria ter que escolher entre
-          estar elegante ou estar confortável. Durante muito tempo, a moda
+          A <strong className="text-foreground">Urban Flex</strong> nasceu de
+          uma necessidade real: o homem moderno não deveria ter que escolher
+          entre estar elegante ou estar confortável. Durante muito tempo, a moda
           masculina foi rígida, literalmente.
         </p>
         <p>
@@ -38,9 +40,10 @@ export default function EmpresaPage() {
       <section className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* CARD MISSÃO */}
-          <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-2xl hover:border-sky-500/30 transition-all group hover:-translate-y-1">
-            <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center text-sky-400 mb-6 group-hover:bg-sky-500/10 transition-colors">
-              {/* Ícone Alvo/Missão */}
+          {/* bg-card: Branco (Light) / Zinc-900 (Dark) */}
+          <div className="bg-card border border-border p-8 rounded-2xl hover:border-sky-500/30 transition-all group hover:-translate-y-1 shadow-sm">
+            {/* CORREÇÃO DO ÍCONE: Usando bg-secondary (Zinc-100 Light / Zinc-800 Dark) */}
+            <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-sky-500 mb-6 group-hover:bg-sky-500/10 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -56,19 +59,19 @@ export default function EmpresaPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-alt">
+            <h3 className="text-xl font-bold text-foreground mb-3 font-alt">
               Nossa Missão
             </h3>
-            <p className="text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               Proporcionar conforto extremo e estilo impecável através de
               tecnologia, elevando a autoestima do homem em qualquer ocasião.
             </p>
           </div>
 
           {/* CARD VISÃO */}
-          <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-2xl hover:border-sky-500/30 transition-all group hover:-translate-y-1">
-            <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center text-sky-400 mb-6 group-hover:bg-sky-500/10 transition-colors">
-              {/* Ícone Olho/Visão */}
+          <div className="bg-card border border-border p-8 rounded-2xl hover:border-sky-500/30 transition-all group hover:-translate-y-1 shadow-sm">
+            {/* CORREÇÃO DO ÍCONE: bg-secondary */}
+            <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-sky-500 mb-6 group-hover:bg-sky-500/10 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -89,19 +92,19 @@ export default function EmpresaPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-alt">
+            <h3 className="text-xl font-bold text-foreground mb-3 font-alt">
               Nossa Visão
             </h3>
-            <p className="text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               Ser a referência nacional em moda inteligente (Smartwear),
               reconhecida pela inovação contínua e excelência no atendimento.
             </p>
           </div>
 
           {/* CARD VALORES */}
-          <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-2xl hover:border-sky-500/30 transition-all group hover:-translate-y-1">
-            <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center text-sky-400 mb-6 group-hover:bg-sky-500/10 transition-colors">
-              {/* Ícone Diamante/Valores */}
+          <div className="bg-card border border-border p-8 rounded-2xl hover:border-sky-500/30 transition-all group hover:-translate-y-1 shadow-sm">
+            {/* CORREÇÃO DO ÍCONE: bg-secondary */}
+            <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-sky-500 mb-6 group-hover:bg-sky-500/10 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -117,10 +120,10 @@ export default function EmpresaPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-alt">
+            <h3 className="text-xl font-bold text-foreground mb-3 font-alt">
               Nossos Valores
             </h3>
-            <ul className="text-sm leading-relaxed list-disc list-inside space-y-1 marker:text-sky-500">
+            <ul className="text-sm leading-relaxed list-disc list-inside space-y-1 marker:text-sky-500 text-muted-foreground">
               <li>Qualidade Intransigente</li>
               <li>Foco no Cliente</li>
               <li>Inovação Constante</li>
@@ -131,13 +134,13 @@ export default function EmpresaPage() {
       </section>
 
       {/* Faixa Final */}
-      <section className="mt-24 border-t border-zinc-900 pt-12 text-center">
-        <p className="text-zinc-500 text-sm mb-6">
+      <section className="mt-24 border-t border-border pt-12 text-center">
+        <p className="text-muted-foreground text-sm mb-6">
           Junte-se a milhares de homens que já elevaram seu padrão.
         </p>
         <a
           href="/"
-          className="inline-flex text-sky-400 font-bold uppercase tracking-widest text-xs hover:text-white transition-colors border-b border-sky-400/30 pb-1 hover:border-sky-400"
+          className="inline-flex text-sky-500 font-bold uppercase tracking-widest text-xs hover:text-foreground transition-colors border-b border-sky-500/30 pb-1 hover:border-sky-500"
         >
           Voltar para a Loja
         </a>

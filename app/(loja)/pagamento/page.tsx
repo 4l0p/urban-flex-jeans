@@ -2,19 +2,19 @@ import React from "react";
 
 export default function PagamentoPage() {
   return (
-    <main className="bg-zinc-950 min-h-screen pt-32 pb-20 text-gray-300">
+    <main className="bg-background min-h-screen pt-32 pb-20 text-muted-foreground transition-colors duration-300">
       {/* Cabeçalho */}
       <section className="max-w-4xl mx-auto px-6 text-center mb-16">
         <span className="text-sky-500 font-bold tracking-[0.2em] uppercase text-sm font-alt">
           Compra Segura
         </span>
-        <h1 className="text-3xl md:text-5xl font-black text-white mt-4 font-alt tracking-tight">
+        <h1 className="text-3xl md:text-5xl font-black text-foreground mt-4 font-alt tracking-tight">
           POLÍTICA DE <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
             PAGAMENTO
           </span>
         </h1>
-        <p className="text-zinc-400 mt-6 max-w-2xl mx-auto">
+        <p className="text-muted-foreground mt-6 max-w-2xl mx-auto">
           Oferecemos as opções mais seguras e práticas do mercado para você
           finalizar sua compra com tranquilidade. Escolha a que melhor se adapta
           ao seu estilo.
@@ -25,16 +25,16 @@ export default function PagamentoPage() {
       <section className="max-w-5xl mx-auto px-6 mb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card: Cartão de Crédito */}
-          <div className="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl hover:border-sky-500/30 transition-all group">
-            <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center text-white mb-6 group-hover:bg-sky-500 group-hover:text-white transition-colors shadow-lg shadow-black/50">
-              {/* Ícone Cartão */}
+          <div className="bg-card border border-border p-8 rounded-2xl hover:border-sky-500/30 transition-all group shadow-sm">
+            <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center mb-6 group-hover:bg-sky-500 transition-colors shadow-sm dark:shadow-lg dark:shadow-black/50">
+              {/* CORREÇÃO FINAL: text-foreground para a cor base (preto/branco) e group-hover:text-white para o hover */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-7 h-7"
+                className="w-7 h-7 text-foreground group-hover:text-white transition-colors"
               >
                 <path
                   strokeLinecap="round"
@@ -43,14 +43,14 @@ export default function PagamentoPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-alt">
+            <h3 className="text-xl font-bold text-foreground mb-3 font-alt">
               Cartão de Crédito
             </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Aceitamos as principais bandeiras do mercado (Visa, Mastercard,
               Elo).
             </p>
-            <ul className="text-sm text-zinc-500 space-y-2">
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                 Parcelamento em até 4x
@@ -63,19 +63,19 @@ export default function PagamentoPage() {
           </div>
 
           {/* Card: PIX */}
-          <div className="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl hover:border-sky-500/30 transition-all group relative overflow-hidden">
+          <div className="bg-card border border-border p-8 rounded-2xl hover:border-sky-500/30 transition-all group relative overflow-hidden shadow-sm">
             <div className="absolute top-0 right-0 bg-green-500/10 text-green-500 text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
               Recomendado
             </div>
-            <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center text-white mb-6 group-hover:bg-green-500 group-hover:text-white transition-colors shadow-lg shadow-black/50">
-              {/* Ícone PIX (Raios) */}
+            <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-500 transition-colors shadow-sm dark:shadow-lg dark:shadow-black/50">
+              {/* CORREÇÃO FINAL: text-foreground */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-7 h-7"
+                className="w-7 h-7 text-foreground group-hover:text-white transition-colors"
               >
                 <path
                   strokeLinecap="round"
@@ -84,11 +84,13 @@ export default function PagamentoPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-alt">PIX</h3>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+            <h3 className="text-xl font-bold text-foreground mb-3 font-alt">
+              PIX
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               A forma mais rápida de receber seu pedido. Pagou, aprovou na hora.
             </p>
-            <ul className="text-sm text-zinc-500 space-y-2">
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                 Aprovação instantânea
@@ -101,16 +103,16 @@ export default function PagamentoPage() {
           </div>
 
           {/* Card: Boleto */}
-          <div className="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl hover:border-sky-500/30 transition-all group">
-            <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center text-white mb-6 group-hover:bg-sky-500 group-hover:text-white transition-colors shadow-lg shadow-black/50">
-              {/* Ícone Boleto/Documento */}
+          <div className="bg-card border border-border p-8 rounded-2xl hover:border-sky-500/30 transition-all group shadow-sm">
+            <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center mb-6 group-hover:bg-sky-500 transition-colors shadow-sm dark:shadow-lg dark:shadow-black/50">
+              {/* CORREÇÃO FINAL: text-foreground */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-7 h-7"
+                className="w-7 h-7 text-foreground group-hover:text-white transition-colors"
               >
                 <path
                   strokeLinecap="round"
@@ -119,13 +121,13 @@ export default function PagamentoPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-alt">
+            <h3 className="text-xl font-bold text-foreground mb-3 font-alt">
               Boleto Bancário
             </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Ideal para quem prefere pagar à vista mas não usa PIX.
             </p>
-            <ul className="text-sm text-zinc-500 space-y-2">
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                 Vencimento em até 3 dias úteis
@@ -141,27 +143,27 @@ export default function PagamentoPage() {
 
       {/* Regras Importantes */}
       <section className="max-w-4xl mx-auto px-6">
-        <h2 className="text-2xl font-bold text-white font-alt mb-8 border-l-4 border-sky-500 pl-4">
+        <h2 className="text-2xl font-bold text-foreground font-alt mb-8 border-l-4 border-sky-500 pl-4">
           Informações Importantes
         </h2>
 
         <div className="space-y-8">
-          <div className="bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
-            <h4 className="text-white font-bold mb-2">
+          <div className="bg-card p-6 rounded-lg border border-border shadow-sm">
+            <h4 className="text-foreground font-bold mb-2">
               1. Confirmação de Pagamento
             </h4>
-            <p className="text-zinc-400 text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               O prazo de entrega do seu pedido começa a contar somente após a
               confirmação do pagamento pela instituição financeira. Você
               receberá um e-mail automático assim que o pagamento for aprovado.
             </p>
           </div>
 
-          <div className="bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
-            <h4 className="text-white font-bold mb-2">
+          <div className="bg-card p-6 rounded-lg border border-border shadow-sm">
+            <h4 className="text-foreground font-bold mb-2">
               2. Segurança na Transação
             </h4>
-            <p className="text-zinc-400 text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               Utilizamos gateway de pagamento criptografado. Nenhuma informação
               financeira fica salva em nossos servidores. Para sua segurança,
               pedidos pagos com cartão de crédito podem passar por uma análise
@@ -173,10 +175,10 @@ export default function PagamentoPage() {
       </section>
 
       {/* Footer da Página */}
-      <div className="text-center mt-20 border-t border-zinc-900 pt-10">
+      <div className="text-center mt-20 border-t border-border pt-10">
         <a
           href="/"
-          className="text-sky-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+          className="text-sky-500 hover:text-foreground transition-colors text-sm font-bold uppercase tracking-widest"
         >
           Voltar para a Loja
         </a>

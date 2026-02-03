@@ -46,7 +46,6 @@ export default function BuyModal() {
     }
     setLoading(true);
 
-    // Salva os dados na sessão para recuperar no checkout sem sujar a URL
     if (typeof window !== "undefined") {
       sessionStorage.setItem(
         "checkoutData",
@@ -54,12 +53,12 @@ export default function BuyModal() {
           size,
           shipping,
           price: basePrice,
-        })
+        }),
       );
     }
 
     setTimeout(() => {
-      router.push("/checkout"); // URL limpa
+      router.push("/checkout");
       closeModal();
     }, 1000);
   };
@@ -72,16 +71,19 @@ export default function BuyModal() {
         onClick={closeModal}
       />
 
-      {/* Sidebar */}
-      <div className="relative w-full max-w-md h-full bg-zinc-950 border-l border-zinc-800 shadow-2xl flex flex-col animate-slide-in-right">
-        {/* Header Compacto */}
-        <div className="px-4 py-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-950 shrink-0">
-          <h2 className="text-base font-bold text-white tracking-tight">
+      {/* Sidebar - MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
+      <div className="relative w-full max-w-md h-full bg-background border-l border-border shadow-2xl flex flex-col animate-slide-in-right transition-colors duration-300">
+        {/* Header Compacto - MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
+        <div className="px-4 py-3 border-b border-border flex justify-between items-center bg-background shrink-0">
+          {/* MUDANÇA: text-white -> text-foreground */}
+          <h2 className="text-base font-bold text-foreground tracking-tight">
             Kit 2 Camisas Urban Flex
           </h2>
           <button
             onClick={closeModal}
-            className="text-gray-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            // MUDANÇA: text-gray-400 -> text-muted-foreground | hover:text-white -> hover:text-foreground
+            // MUDANÇA: bg-zinc-900 -> bg-muted/50 | hover:bg-zinc-800 -> hover:bg-muted
+            className="text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted w-8 h-8 rounded-full flex items-center justify-center transition-colors"
           >
             ✕
           </button>
@@ -91,7 +93,8 @@ export default function BuyModal() {
         <div className="flex-1 flex flex-col p-4 overflow-y-auto">
           {/* Imagens (Altura h-28) */}
           <div className="flex gap-2 h-28 mb-3 shrink-0">
-            <div className="flex-1 relative rounded-lg overflow-hidden border border-zinc-800 group">
+            {/* MUDANÇA: border-zinc-800 -> border-border */}
+            <div className="flex-1 relative rounded-lg overflow-hidden border border-border group">
               <img
                 src="https://4l0p.github.io/shirt/assets/azul_escuro_principal.png"
                 alt="Deep Blue"
@@ -101,7 +104,8 @@ export default function BuyModal() {
                 Deep Blue
               </div>
             </div>
-            <div className="flex-1 relative rounded-lg overflow-hidden border border-zinc-800 group">
+            {/* MUDANÇA: border-zinc-800 -> border-border */}
+            <div className="flex-1 relative rounded-lg overflow-hidden border border-border group">
               <img
                 src="https://4l0p.github.io/shirt/assets/azul_claro_principal.png"
                 alt="Sky Blue"
@@ -117,14 +121,15 @@ export default function BuyModal() {
           <div className="mb-2 shrink-0">
             <div className="flex items-center justify-between mb-1.5">
               <span
+                // MUDANÇA: text-white -> text-foreground
                 className={`font-bold text-xs uppercase tracking-wider transition-colors duration-300 ${
-                  sizeError ? "text-red-500 animate-pulse" : "text-white"
+                  sizeError ? "text-red-500 animate-pulse" : "text-foreground"
                 }`}
               >
                 {sizeError ? "⚠️ SELECIONE:" : "Tamanho (Válido p/ as 2)"}
               </span>
               {size && (
-                <span className="text-[10px] text-sky-400 font-bold bg-sky-400/10 px-2 rounded border border-sky-400/20">
+                <span className="text-[10px] text-sky-500 font-bold bg-sky-500/10 px-2 rounded border border-sky-500/20">
                   {size} Selecionado
                 </span>
               )}
@@ -135,12 +140,14 @@ export default function BuyModal() {
                 <button
                   key={s}
                   onClick={() => handleSelectSize(s)}
+                  // MUDANÇA: border-zinc-800 -> border-border | bg-zinc-900 -> bg-muted/20
+                  // MUDANÇA: text-gray-400 -> text-muted-foreground
                   className={`h-9 rounded border font-bold transition-all text-xs flex items-center justify-center ${
                     size === s
                       ? "bg-sky-600 border-sky-600 text-white shadow-md shadow-sky-900/30 scale-105 z-10"
                       : sizeError
-                      ? "border-red-500 text-red-500 bg-red-500/10"
-                      : "border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white bg-zinc-900"
+                        ? "border-red-500 text-red-500 bg-red-500/10"
+                        : "border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground bg-muted/20"
                   }`}
                 >
                   {s}
@@ -149,13 +156,12 @@ export default function BuyModal() {
             </div>
           </div>
 
-          {/* ÁREA DE MEDIDAS (Compacta e Sem Scroll) */}
+          {/* ÁREA DE MEDIDAS */}
           <div className="mb-2 shrink-0">
-            {/* OPÇÃO 1: Card de Destaque (Quando tamanho selecionado) */}
             {selectedSizeData ? (
               <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg p-2 animate-fade-in">
                 <div className="flex items-center gap-2 mb-1.5 justify-center">
-                  <span className="text-sky-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span className="text-sky-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -174,46 +180,40 @@ export default function BuyModal() {
                   </span>
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="bg-zinc-950/80 rounded p-1 border border-sky-500/10">
-                    <span className="block text-[8px] text-gray-500 uppercase">
-                      Peito
-                    </span>
-                    <span className="block text-xs font-bold text-white">
-                      {selectedSizeData.peito}
-                    </span>
-                  </div>
-                  <div className="bg-zinc-950/80 rounded p-1 border border-sky-500/10">
-                    <span className="block text-[8px] text-gray-500 uppercase">
-                      Ombro
-                    </span>
-                    <span className="block text-xs font-bold text-white">
-                      {selectedSizeData.ombro}
-                    </span>
-                  </div>
-                  <div className="bg-zinc-950/80 rounded p-1 border border-sky-500/10">
-                    <span className="block text-[8px] text-gray-500 uppercase">
-                      Comp
-                    </span>
-                    <span className="block text-xs font-bold text-white">
-                      {selectedSizeData.comp}
-                    </span>
-                  </div>
-                  <div className="bg-zinc-950/80 rounded p-1 border border-sky-500/10">
-                    <span className="block text-[8px] text-gray-500 uppercase">
-                      Manga
-                    </span>
-                    <span className="block text-xs font-bold text-white">
-                      {selectedSizeData.manga}
-                    </span>
-                  </div>
+                  {["Peito", "Ombro", "Comp", "Manga"].map((label) => {
+                    const key = label.toLowerCase();
+                    return (
+                      // MUDANÇA: bg-zinc-950/80 -> bg-background/80
+                      <div
+                        key={label}
+                        className="bg-background/80 rounded p-1 border border-sky-500/10"
+                      >
+                        {/* MUDANÇA: text-gray-500 -> text-muted-foreground */}
+                        <span className="block text-[8px] text-muted-foreground uppercase">
+                          {label}
+                        </span>
+                        {/* MUDANÇA: text-white -> text-foreground */}
+                        <span className="block text-xs font-bold text-foreground">
+                          {
+                            selectedSizeData[
+                              key as keyof typeof selectedSizeData
+                            ]
+                          }
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
-              // OPÇÃO 2: Tabela Completa Compacta (Sem Scroll)
-              <div className="border border-zinc-800 rounded-lg bg-zinc-900/30 overflow-hidden transition-all duration-300">
+              // Tabela Completa Compacta
+              // MUDANÇA: border-zinc-800 -> border-border | bg-zinc-900/30 -> bg-muted/10
+              <div className="border border-border rounded-lg bg-muted/10 overflow-hidden transition-all duration-300">
                 <button
                   onClick={() => setIsTableOpen(!isTableOpen)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-zinc-800/50 transition-colors bg-zinc-900"
+                  // MUDANÇA: text-gray-400 -> text-muted-foreground | hover:text-white -> hover:text-foreground
+                  // MUDANÇA: bg-zinc-900 -> bg-muted/30 | hover:bg-zinc-800/50 -> hover:bg-muted/50
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors bg-muted/30"
                 >
                   <span className="flex items-center gap-2 text-[10px]">
                     📏 Dúvida no tamanho? Ver Tabela
@@ -227,11 +227,12 @@ export default function BuyModal() {
                   </span>
                 </button>
 
-                {/* Tabela Renderizada Inteira sem Scrollbar */}
                 {isTableOpen && (
-                  <div className="border-t border-zinc-800 bg-zinc-950/50 p-1">
+                  // MUDANÇA: border-zinc-800 -> border-border | bg-zinc-950/50 -> bg-background/50
+                  <div className="border-t border-border bg-background/50 p-1">
                     <table className="w-full text-center text-[9px]">
-                      <thead className="text-zinc-500 font-bold border-b border-zinc-800">
+                      {/* MUDANÇA: text-zinc-500 -> text-muted-foreground | border-zinc-800 -> border-border */}
+                      <thead className="text-muted-foreground font-bold border-b border-border">
                         <tr>
                           <th className="py-1">Tam</th>
                           <th className="py-1">Peito</th>
@@ -240,14 +241,17 @@ export default function BuyModal() {
                           <th className="py-1">Manga</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-zinc-800/50">
+                      {/* MUDANÇA: divide-zinc-800/50 -> divide-border/50 */}
+                      <tbody className="divide-y divide-border/50">
                         {sizeData.map((row) => (
                           <tr
                             key={row.tam}
                             onClick={() => handleSelectSize(row.tam)}
-                            className="text-zinc-400 hover:bg-zinc-800 cursor-pointer hover:text-white transition-colors"
+                            // MUDANÇA: text-zinc-400 -> text-muted-foreground | hover:bg-zinc-800 -> hover:bg-muted/30 | hover:text-white -> hover:text-foreground
+                            className="text-muted-foreground hover:bg-muted/30 cursor-pointer hover:text-foreground transition-colors"
                           >
-                            <td className="py-0.5 font-bold text-white">
+                            {/* MUDANÇA: text-white -> text-foreground */}
+                            <td className="py-0.5 font-bold text-foreground">
                               {row.tam}
                             </td>
                             <td className="py-0.5">{row.peito}</td>
@@ -266,22 +270,24 @@ export default function BuyModal() {
 
           {/* Frete */}
           <div className="shrink-0 mt-auto">
-            <span className="text-white font-bold text-xs uppercase tracking-wider mb-1.5 block">
+            {/* MUDANÇA: text-white -> text-foreground */}
+            <span className="text-foreground font-bold text-xs uppercase tracking-wider mb-1.5 block">
               Envio
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setShipping("free")}
+                // MUDANÇA: bg-zinc-900 -> bg-muted/20 | border-zinc-800 -> border-border | hover:border-zinc-700 -> hover:border-muted-foreground
                 className={`p-2.5 rounded-lg border text-left transition-all relative ${
                   shipping === "free"
                     ? "bg-sky-500/10 border-green-500 shadow-[0_0_15px_rgba(14,165,233,0.1)]"
-                    : "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
+                    : "bg-muted/20 border-border hover:border-muted-foreground"
                 }`}
               >
                 <div className="flex justify-between items-center mb-0.5">
                   <span
                     className={`font-bold text-xs ${
-                      shipping === "free" ? "text-green-400" : "text-white"
+                      shipping === "free" ? "text-green-500" : "text-foreground"
                     }`}
                   >
                     Grátis
@@ -290,53 +296,60 @@ export default function BuyModal() {
                     <span className="text-green-500 text-[10px]">✓</span>
                   )}
                 </div>
-                <p className="text-gray-500 text-[9px]">7-15 dias</p>
+                {/* MUDANÇA: text-gray-500 -> text-muted-foreground */}
+                <p className="text-muted-foreground text-[9px]">7-15 dias</p>
               </button>
 
               <button
                 onClick={() => setShipping("express")}
+                // MUDANÇA: bg-zinc-900 -> bg-muted/20 | border-zinc-800 -> border-border
                 className={`p-2.5 rounded-lg border text-left transition-all relative ${
                   shipping === "express"
                     ? "bg-blue-600/10 border-blue-600"
-                    : "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
+                    : "bg-muted/20 border-border hover:border-muted-foreground"
                 }`}
               >
                 <div className="flex justify-between items-center mb-0.5">
                   <span
                     className={`font-bold text-xs ${
-                      shipping === "express" ? "text-blue-400" : "text-white"
+                      shipping === "express"
+                        ? "text-blue-500"
+                        : "text-foreground"
                     }`}
                   >
                     Expresso
                   </span>
-                  <span className="text-white font-bold text-[9px]">
+                  <span className="text-foreground font-bold text-[9px]">
                     +R$14,90
                   </span>
                 </div>
-                <p className="text-gray-500 text-[9px]">2-5 dias</p>
+                <p className="text-muted-foreground text-[9px]">2-5 dias</p>
               </button>
             </div>
           </div>
         </div>
 
         {/* Rodapé Fixo */}
-        <div className="p-4 border-t border-zinc-800 bg-zinc-950 shrink-0 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.5)]">
+        {/* MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
+        <div className="p-4 border-t border-border bg-background shrink-0 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.1)]">
           <div className="flex justify-between items-end mb-3">
-            <div className="text-gray-400 text-xs">
+            {/* MUDANÇA: text-gray-400 -> text-muted-foreground */}
+            <div className="text-muted-foreground text-xs">
               <p>Subtotal: R$ 99,90</p>
               <p
                 className={
-                  shipping === "free" ? "text-green-700" : "text-sky-700"
+                  shipping === "free" ? "text-green-600" : "text-sky-600"
                 }
               >
                 Frete: {shipping === "free" ? "Grátis" : "R$ 14,90"}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] text-gray-300 uppercase font-bold mb-0.5">
+              {/* MUDANÇA: text-gray-300 -> text-muted-foreground */}
+              <p className="text-[10px] text-muted-foreground uppercase font-bold mb-0.5">
                 Total
               </p>
-              <p className="font-alt text-2xl font-black text-sky-400 leading-none">
+              <p className="font-alt text-2xl font-black text-sky-500 leading-none">
                 {totalPrice.toLocaleString("pt-BR", {
                   style: "currency",
                   currency: "BRL",

@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 export default function FAQ() {
-  // Estado para controlar qual pergunta está aberta
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const faqs = [
@@ -39,14 +38,18 @@ export default function FAQ() {
   };
 
   return (
-    <section className="w-full bg-zinc-950 py-24 px-6 border-t border-zinc-900">
+    <section
+      // MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-900 -> border-border
+      className="w-full bg-background py-24 px-6 border-t border-border transition-colors duration-300"
+    >
       <div className="max-w-3xl mx-auto">
         {/* Cabeçalho */}
         <div className="text-center mb-16">
           <span className="text-sky-500 font-bold tracking-widest uppercase text-sm">
             Dúvidas
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mt-2">
+          {/* MUDANÇA: text-white -> text-foreground */}
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">
             Perguntas Frequentes
           </h2>
         </div>
@@ -56,10 +59,13 @@ export default function FAQ() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className={`border border-zinc-800 rounded-lg overflow-hidden transition-all duration-300 ${
+              // MUDANÇA: border-zinc-800 -> border-border
+              // MUDANÇA: bg-zinc-900/50 -> bg-muted/20 (Fundo quando aberto)
+              // MUDANÇA: hover:border-zinc-700 -> hover:border-muted-foreground
+              className={`border border-border rounded-lg overflow-hidden transition-all duration-300 ${
                 openIndex === index
-                  ? "bg-zinc-900/50 border-sky-900/50"
-                  : "bg-transparent hover:border-zinc-700"
+                  ? "bg-muted/20 border-sky-500/50"
+                  : "bg-transparent hover:border-muted-foreground"
               }`}
             >
               {/* Pergunta (Botão) */}
@@ -68,10 +74,11 @@ export default function FAQ() {
                 className="w-full flex justify-between items-center p-6 text-left focus:outline-none group"
               >
                 <span
+                  // MUDANÇA: text-white -> text-foreground | group-hover:text-gray-200 -> group-hover:text-muted-foreground
                   className={`font-bold text-lg transition-colors ${
                     openIndex === index
-                      ? "text-sky-400"
-                      : "text-white group-hover:text-gray-200"
+                      ? "text-sky-500"
+                      : "text-foreground group-hover:text-muted-foreground"
                   }`}
                 >
                   {faq.question}
@@ -95,7 +102,8 @@ export default function FAQ() {
                     : "max-h-0 opacity-0"
                 }`}
               >
-                <div className="p-6 pt-0 text-gray-400 leading-relaxed text-sm md:text-base border-t border-zinc-800/50 mt-2">
+                {/* MUDANÇA: text-gray-400 -> text-muted-foreground | border-zinc-800/50 -> border-border/50 */}
+                <div className="p-6 pt-0 text-muted-foreground leading-relaxed text-sm md:text-base border-t border-border/50 mt-2">
                   {faq.answer}
                 </div>
               </div>

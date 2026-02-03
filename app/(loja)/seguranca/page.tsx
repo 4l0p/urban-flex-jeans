@@ -2,19 +2,20 @@ import React from "react";
 
 export default function SegurancaPage() {
   return (
-    <main className="bg-zinc-950 min-h-screen pt-32 pb-20 text-gray-300">
+    // CAMADA 1: Variáveis Globais
+    <main className="bg-background min-h-screen pt-32 pb-20 text-muted-foreground transition-colors duration-300">
       {/* Cabeçalho */}
       <section className="max-w-4xl mx-auto px-6 text-center mb-16">
         <span className="text-sky-500 font-bold tracking-[0.2em] uppercase text-sm font-alt">
           Dados Protegidos
         </span>
-        <h1 className="text-3xl md:text-5xl font-black text-white mt-4 font-alt tracking-tight">
+        <h1 className="text-3xl md:text-5xl font-black text-foreground mt-4 font-alt tracking-tight">
           SEGURANÇA E <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
             PRIVACIDADE
           </span>
         </h1>
-        <p className="text-zinc-400 mt-6 max-w-2xl mx-auto">
+        <p className="text-muted-foreground mt-6 max-w-2xl mx-auto">
           Sua tranquilidade é nossa prioridade. Utilizamos criptografia de ponta
           para garantir que seus dados estejam blindados do início ao fim da
           compra.
@@ -23,9 +24,10 @@ export default function SegurancaPage() {
 
       {/* Destaque Segurança (SSL) */}
       <section className="max-w-5xl mx-auto px-6 mb-20">
-        <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 p-8 md:p-12 rounded-2xl flex flex-col md:flex-row items-center gap-8">
+        {/* CARD GRANDE: bg-card + borda dinâmica */}
+        <div className="bg-card border border-border p-8 md:p-12 rounded-2xl flex flex-col md:flex-row items-center gap-8 shadow-sm">
+          {/* Mantendo o verde pois indica segurança SSL */}
           <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 shrink-0">
-            {/* Ícone Cadeado/SSL */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -42,14 +44,14 @@ export default function SegurancaPage() {
             </svg>
           </div>
           <div className="text-center md:text-left">
-            <h3 className="text-2xl font-bold text-white mb-2 font-alt">
+            <h3 className="text-2xl font-bold text-foreground mb-2 font-alt">
               Ambiente 100% Seguro (SSL)
             </h3>
-            <p className="text-zinc-400 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Nosso site conta com Certificado de Segurança SSL (Secure Socket
               Layer). Isso cria um "túnel" criptografado entre você e nosso
               servidor. Garantimos que dados críticos como número de cartão de
-              crédito <strong className="text-white">jamais</strong> ficam
+              crédito <strong className="text-foreground">jamais</strong> ficam
               expostos ou são armazenados de forma insegura.
             </p>
           </div>
@@ -60,7 +62,8 @@ export default function SegurancaPage() {
       <section className="max-w-4xl mx-auto px-6 space-y-16">
         {/* Privacidade */}
         <div className="flex gap-6">
-          <div className="hidden md:block w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center text-sky-500 shrink-0">
+          {/* ÍCONE PEQUENO: bg-secondary (Zinc-100 Light / Zinc-900 Dark) */}
+          <div className="hidden md:flex w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-sky-500 shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -82,20 +85,20 @@ export default function SegurancaPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white mb-4 font-alt">
+            <h2 className="text-xl font-bold text-foreground mb-4 font-alt">
               Privacidade e Uso de Dados
             </h2>
-            <div className="space-y-4 text-zinc-400 leading-relaxed">
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                A <strong>Urban Flex Jeans</strong> assume o compromisso de não
-                comercializar ou transferir seus dados para terceiros.
-                Respeitamos sua privacidade acima de tudo.
+                A <strong className="text-foreground">Urban Flex Jeans</strong>{" "}
+                assume o compromisso de não comercializar ou transferir seus
+                dados para terceiros. Respeitamos sua privacidade acima de tudo.
               </p>
               <p>
                 As informações coletadas (como nome e e-mail) são utilizadas
                 internamente apenas para:
               </p>
-              <ul className="list-disc list-inside space-y-1 text-zinc-500 pl-2">
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-2">
                 <li>Processar e entregar seus pedidos com eficiência.</li>
                 <li>
                   Melhorar nossa comunicação e oferecer produtos que façam
@@ -112,7 +115,7 @@ export default function SegurancaPage() {
 
         {/* Coleta de Informações */}
         <div className="flex gap-6">
-          <div className="hidden md:block w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center text-sky-500 shrink-0">
+          <div className="hidden md:flex w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-sky-500 shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -129,27 +132,27 @@ export default function SegurancaPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white mb-4 font-alt">
+            <h2 className="text-xl font-bold text-foreground mb-4 font-alt">
               Quais dados coletamos?
             </h2>
-            <p className="text-zinc-400 leading-relaxed mb-4">
+            <p className="text-muted-foreground leading-relaxed mb-4">
               Coletamos apenas o necessário para realizar sua compra com
               segurança fiscal e logística:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800">
-                <span className="text-white font-bold block mb-1">
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <span className="text-foreground font-bold block mb-1">
                   Dados Pessoais
                 </span>
-                <span className="text-sm text-zinc-500">
+                <span className="text-sm text-muted-foreground">
                   Nome, CPF, Data de Nascimento (para emissão de Nota Fiscal).
                 </span>
               </div>
-              <div className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800">
-                <span className="text-white font-bold block mb-1">
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <span className="text-foreground font-bold block mb-1">
                   Dados de Contato
                 </span>
-                <span className="text-sm text-zinc-500">
+                <span className="text-sm text-muted-foreground">
                   E-mail, Telefone e Endereço de Entrega completo.
                 </span>
               </div>
@@ -159,7 +162,7 @@ export default function SegurancaPage() {
 
         {/* E-mails e Anti-Spam */}
         <div className="flex gap-6">
-          <div className="hidden md:block w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center text-sky-500 shrink-0">
+          <div className="hidden md:flex w-12 h-12 bg-secondary rounded-lg flex items-center justify-center text-sky-500 shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -176,10 +179,10 @@ export default function SegurancaPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white mb-4 font-alt">
+            <h2 className="text-xl font-bold text-foreground mb-4 font-alt">
               E-mails e Anti-SPAM
             </h2>
-            <p className="text-zinc-400 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Somos contra SPAM. Nossos e-mails promocionais são enviados apenas
               se você autorizar (opt-in). Caso não queira mais receber nossas
               ofertas exclusivas, basta clicar no link de descadastro presente
@@ -190,10 +193,10 @@ export default function SegurancaPage() {
       </section>
 
       {/* Footer da Página */}
-      <div className="text-center mt-20 border-t border-zinc-900 pt-10">
+      <div className="text-center mt-20 border-t border-border pt-10">
         <a
           href="/"
-          className="text-sky-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+          className="text-sky-500 hover:text-foreground transition-colors text-sm font-bold uppercase tracking-widest"
         >
           Voltar para a Loja
         </a>

@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Montserrat, Inter } from "next/font/google";
+import { APP_THEME } from "@/lib/config"; // <--- Importamos a configuração
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -23,9 +24,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
+    /* AQUI APLICAMOS A CLASSE 'dark' ou 'light' baseada na config */
+    <html lang="pt-BR" className={APP_THEME} suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${montserrat.variable} font-sans bg-zinc-950 text-white antialiased`}
+        /* TROCAMOS: 'bg-zinc-950 text-white' 
+           POR: 'bg-background text-foreground' 
+           
+           Assim, o fundo muda sozinho dependendo do tema.
+        */
+        className={`${inter.variable} ${montserrat.variable} font-sans bg-background text-foreground antialiased transition-colors duration-300`}
       >
         {children}
       </body>

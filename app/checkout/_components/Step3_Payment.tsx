@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
-// Removemos o useRouter daqui, pois quem navega agora é o pai
 
 interface Step3Props {
   currentStep: number;
   paymentMethod: "credit" | "pix" | "boleto";
   setPaymentMethod: (method: "credit" | "pix" | "boleto") => void;
-  onFinish: () => void; // <--- NOVA PROP QUE VEM DO PAI
+  onFinish: () => void;
 }
 
 export default function Step3_Payment({
   currentStep,
   paymentMethod,
   setPaymentMethod,
-  onFinish, // Recebendo a função
+  onFinish,
 }: Step3Props) {
-  // --- ESTADOS ---
   const [cardData, setCardData] = useState({
     number: "",
     name: "",
@@ -77,7 +75,7 @@ export default function Step3_Payment({
     } else if (
       clean.match(/^6/) ||
       clean.match(
-        /^(4011|4389|4514|4576|5041|5066|5090|6277|6362|6363|650|6516|6550)/
+        /^(4011|4389|4514|4576|5041|5066|5090|6277|6362|6363|650|6516|6550)/,
       )
     ) {
       brand = "ELO";
@@ -118,7 +116,7 @@ export default function Step3_Payment({
   // --- HANDLERS ---
   const handleCardMask = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: string
+    field: string,
   ) => {
     let value = e.target.value;
     if (field === "number") {
@@ -154,7 +152,7 @@ export default function Step3_Payment({
     setTouched((prev: any) => ({ ...prev, [field]: true }));
     const isValid = validators[field as keyof typeof validators]
       ? validators[field as keyof typeof validators](
-          cardData[field as keyof typeof cardData]
+          cardData[field as keyof typeof cardData],
         )
       : true;
     setErrors((prev: any) => ({ ...prev, [field]: !isValid }));
@@ -181,7 +179,6 @@ export default function Step3_Payment({
     setTimeout(() => {
       setPaymentStatus("success");
       setTimeout(() => {
-        // AQUI ESTÁ A MÁGICA: Chamamos a função do pai para salvar os dados
         onFinish();
       }, 2500);
     }, 3000);
@@ -211,12 +208,12 @@ export default function Step3_Payment({
   // --- RENDERIZAÇÃO ---
   if (currentStep < 3) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 opacity-50 grayscale select-none pointer-events-none transition-all">
+      <div className="bg-card border border-border rounded-2xl p-5 opacity-50 grayscale select-none pointer-events-none transition-all">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-zinc-950 border border-zinc-700 text-white flex items-center justify-center text-xs font-bold">
+          <div className="w-6 h-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center text-xs font-bold">
             3
           </div>
-          <h2 className="text-white font-bold text-sm tracking-wide uppercase">
+          <h2 className="text-foreground font-bold text-sm tracking-wide uppercase">
             Pagamento
           </h2>
         </div>
@@ -225,17 +222,17 @@ export default function Step3_Payment({
   }
 
   return (
-    <div className="bg-zinc-900 border border-sky-500 ring-1 ring-sky-500/20 shadow-xl shadow-sky-900/10 rounded-2xl overflow-hidden transition-all duration-300 relative">
+    <div className="bg-card border border-sky-500 ring-1 ring-sky-500/20 shadow-xl shadow-sky-900/10 rounded-2xl overflow-hidden transition-all duration-300 relative">
       {/* OVERLAYS */}
       {paymentStatus !== "idle" && (
-        <div className="absolute inset-0 z-50 bg-zinc-950/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300 p-6 text-center">
+        <div className="absolute inset-0 z-50 bg-card/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300 p-6 text-center">
           {paymentStatus === "processing" && (
             <>
               <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-              <p className="text-white font-bold text-sm tracking-widest animate-pulse">
+              <p className="text-foreground font-bold text-sm tracking-widest animate-pulse">
                 PROCESSANDO PAGAMENTO...
               </p>
-              <p className="text-zinc-500 text-xs mt-2">
+              <p className="text-muted-foreground text-xs mt-2">
                 Estamos validando seus dados. Não feche esta tela.
               </p>
             </>
@@ -266,7 +263,9 @@ export default function Step3_Payment({
               <p className="text-green-500 font-black text-xl tracking-wide mb-1">
                 PAGAMENTO APROVADO!
               </p>
-              <p className="text-zinc-400 text-xs">Redirecionando você...</p>
+              <p className="text-muted-foreground text-xs">
+                Redirecionando você...
+              </p>
               <style jsx>{`
                 @keyframes drawCheck {
                   to {
@@ -280,28 +279,28 @@ export default function Step3_Payment({
       )}
 
       {/* HEADER */}
-      <div className="p-5 border-b border-zinc-800 bg-zinc-900/50 flex items-center gap-3">
-        <div className="w-6 h-6 rounded-full bg-zinc-950 border border-zinc-700 text-white flex items-center justify-center text-xs font-bold shadow-inner">
+      <div className="p-5 border-b border-border flex items-center gap-3">
+        <div className="w-6 h-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center text-xs font-bold shadow-inner">
           3
         </div>
-        <h2 className="text-white font-bold text-sm tracking-wide uppercase">
+        <h2 className="text-foreground font-bold text-sm tracking-wide uppercase">
           Pagamento
         </h2>
       </div>
 
       <div className="p-5">
-        <p className="text-[11px] text-zinc-500 mb-5">
+        <p className="text-[11px] text-muted-foreground mb-5">
           Escolha uma forma de pagamento segura.
         </p>
 
         {/* ABAS */}
-        <div className="grid grid-cols-3 gap-1 p-1 bg-zinc-950 rounded-lg border border-zinc-800 mb-6">
+        <div className="grid grid-cols-3 gap-1 p-1 bg-muted/20 rounded-lg border border-border mb-6">
           <button
             onClick={() => setPaymentMethod("credit")}
             className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all ${
               paymentMethod === "credit"
-                ? "bg-zinc-800 text-white shadow-sm ring-1 ring-white/10"
-                : "text-zinc-500 hover:text-zinc-300"
+                ? "bg-card text-foreground shadow-sm ring-1 ring-border"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Cartão
@@ -311,7 +310,7 @@ export default function Step3_Payment({
             className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all flex flex-col items-center justify-center leading-none gap-0.5 ${
               paymentMethod === "pix"
                 ? "bg-green-600 text-white shadow-sm ring-1 ring-white/10"
-                : "text-zinc-500 hover:text-zinc-300"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             PIX <span className="text-[8px] opacity-80">-5% OFF</span>
@@ -321,7 +320,7 @@ export default function Step3_Payment({
             className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all flex flex-col items-center justify-center leading-none gap-0.5 ${
               paymentMethod === "boleto"
                 ? "bg-blue-600 text-white shadow-sm ring-1 ring-white/10"
-                : "text-zinc-500 hover:text-zinc-300"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Boleto <span className="text-[8px] opacity-80">-5% OFF</span>
@@ -406,7 +405,7 @@ export default function Step3_Payment({
 
             <div className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                   Número do Cartão
                 </label>
                 <div className="relative group">
@@ -414,14 +413,14 @@ export default function Step3_Payment({
                     type="text"
                     placeholder="0000 0000 0000 0000"
                     maxLength={19}
-                    className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 pl-11 text-sm text-white outline-none transition-all placeholder-zinc-700 ${
+                    className={`w-full h-12 bg-background border rounded-lg px-4 pl-11 text-sm text-foreground outline-none transition-all placeholder-muted-foreground ${
                       touched.number && !errors.number
                         ? "border-green-500 focus:border-green-500"
                         : ""
                     } ${
                       touched.number && errors.number
                         ? "border-red-500 focus:border-red-500"
-                        : "border-zinc-800 focus:border-sky-500"
+                        : "border-border focus:border-sky-500"
                     }`}
                     value={cardData.number}
                     onChange={(e) => handleCardMask(e, "number")}
@@ -434,7 +433,7 @@ export default function Step3_Payment({
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                    className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
                   >
                     <path
                       strokeLinecap="round"
@@ -451,21 +450,21 @@ export default function Step3_Payment({
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                   Nome Impresso
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="COMO NO CARTÃO"
-                    className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 text-sm text-white outline-none uppercase transition-all placeholder-zinc-700 ${
+                    className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none uppercase transition-all placeholder-muted-foreground ${
                       touched.name && !errors.name
                         ? "border-green-500 focus:border-green-500"
                         : ""
                     } ${
                       touched.name && errors.name
                         ? "border-red-500 focus:border-red-500"
-                        : "border-zinc-800 focus:border-sky-500"
+                        : "border-border focus:border-sky-500"
                     }`}
                     value={cardData.name}
                     onChange={(e) => handleCardMask(e, "name")}
@@ -482,7 +481,7 @@ export default function Step3_Payment({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                     Validade
                   </label>
                   <div className="relative">
@@ -490,14 +489,14 @@ export default function Step3_Payment({
                       type="text"
                       placeholder="MM/AA"
                       maxLength={5}
-                      className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 text-sm text-white outline-none text-center transition-all placeholder-zinc-700 ${
+                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none text-center transition-all placeholder-muted-foreground ${
                         touched.expiry && !errors.expiry
                           ? "border-green-500 focus:border-green-500"
                           : ""
                       } ${
                         touched.expiry && errors.expiry
                           ? "border-red-500 focus:border-red-500"
-                          : "border-zinc-800 focus:border-sky-500"
+                          : "border-border focus:border-sky-500"
                       }`}
                       value={cardData.expiry}
                       onChange={(e) => handleCardMask(e, "expiry")}
@@ -513,7 +512,7 @@ export default function Step3_Payment({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                     CVV
                   </label>
                   <div className="relative">
@@ -521,14 +520,14 @@ export default function Step3_Payment({
                       type="text"
                       placeholder="123"
                       maxLength={4}
-                      className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 text-sm text-white outline-none text-center transition-all placeholder-zinc-700 ${
+                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none text-center transition-all placeholder-muted-foreground ${
                         touched.cvv && !errors.cvv
                           ? "border-green-500 focus:border-green-500"
                           : ""
                       } ${
                         touched.cvv && errors.cvv
                           ? "border-red-500 focus:border-red-500"
-                          : "border-zinc-800 focus:border-sky-500"
+                          : "border-border focus:border-sky-500"
                       }`}
                       value={cardData.cvv}
                       onChange={(e) => handleCardMask(e, "cvv")}
@@ -547,7 +546,7 @@ export default function Step3_Payment({
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-600"
+                        className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
                       >
                         <path
                           strokeLinecap="round"
@@ -565,12 +564,12 @@ export default function Step3_Payment({
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                   Parcelamento
                 </label>
                 <div className="relative">
                   <select
-                    className="w-full h-12 bg-zinc-950 border border-zinc-800 rounded-lg px-4 text-sm text-white focus:border-sky-500 outline-none appearance-none transition-all cursor-pointer"
+                    className="w-full h-12 bg-background border border-border rounded-lg px-4 text-sm text-foreground focus:border-sky-500 outline-none appearance-none transition-all cursor-pointer"
                     value={cardData.installments}
                     onChange={(e) =>
                       setCardData({ ...cardData, installments: e.target.value })
@@ -589,7 +588,7 @@ export default function Step3_Payment({
                       viewBox="0 0 24 24"
                       strokeWidth={2}
                       stroke="currentColor"
-                      className="w-4 h-4 text-zinc-500"
+                      className="w-4 h-4 text-muted-foreground"
                     >
                       <path
                         strokeLinecap="round"
@@ -627,16 +626,16 @@ export default function Step3_Payment({
         {/* PIX */}
         {paymentMethod === "pix" && (
           <div className="animate-in fade-in zoom-in duration-300">
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6 mb-6">
+            <div className="bg-background border border-border rounded-xl p-6 mb-6">
               <div className="flex items-center justify-between mb-6">
-                <div className="text-white font-bold text-lg flex items-center gap-2">
+                <div className="text-foreground font-bold text-lg flex items-center gap-2">
                   <img className="h-auto w-22" src="/pix.png" alt="Pix" />
                 </div>
                 <div className="bg-green-500 text-black text-[10px] font-bold px-2 py-1 rounded">
                   Aprovação Imediata + 5% OFF
                 </div>
               </div>
-              <ul className="space-y-3 text-zinc-400 text-xs list-disc pl-4 leading-tight">
+              <ul className="space-y-3 text-muted-foreground text-xs list-disc pl-4 leading-tight">
                 <li>30 minutos para pagar</li>
                 <li>Pagamento à vista</li>
                 <li>Após pagar, seu pedido é aprovado na hora</li>
@@ -669,15 +668,15 @@ export default function Step3_Payment({
         {/* BOLETO */}
         {paymentMethod === "boleto" && (
           <div className="animate-in fade-in zoom-in duration-300">
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-8 text-center mb-6">
-              <div className="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-3 border border-zinc-800">
+            <div className="bg-background border border-border rounded-xl p-8 text-center mb-6">
+              <div className="w-12 h-12 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-3 border border-border">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 text-zinc-400"
+                  className="w-6 h-6 text-muted-foreground"
                 >
                   <path
                     strokeLinecap="round"
@@ -691,8 +690,10 @@ export default function Step3_Payment({
                   />
                 </svg>
               </div>
-              <p className="text-white font-bold text-sm">Boleto Bancário</p>
-              <p className="text-zinc-500 text-xs mt-1 leading-relaxed">
+              <p className="text-foreground font-bold text-sm">
+                Boleto Bancário
+              </p>
+              <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
                 Vencimento em 3 dias úteis.
                 <br />
                 Pode levar até 48h para compensar.
@@ -700,7 +701,7 @@ export default function Step3_Payment({
             </div>
             <button
               onClick={handlePaymentSubmit}
-              className="group relative w-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg uppercase tracking-widest shadow-lg shadow-sky-900/20 transform active:scale-[0.98] transition-all flex items-center justify-center border border-zinc-700"
+              className="group relative w-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg uppercase tracking-widest shadow-lg shadow-sky-900/20 transform active:scale-[0.98] transition-all flex items-center justify-center border border-border"
             >
               <span className="text-sm">PAGAR COM BOLETO</span>
               <div className="absolute right-6 flex items-center group-hover:translate-x-1 transition-transform">

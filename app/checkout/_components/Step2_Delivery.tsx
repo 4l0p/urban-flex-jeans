@@ -35,14 +35,12 @@ export default function Step2_Delivery({
   goToStep,
   clientName,
 }: Step2Props) {
-  // --- ESTADOS ---
   const [view, setView] = useState<"list" | "form">("form");
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null
+    null,
   );
 
-  // Form Data
   const [formData, setFormData] = useState<Address>({
     id: "",
     cep: "",
@@ -52,24 +50,19 @@ export default function Step2_Delivery({
     neighborhood: "",
     city: "",
     state: "",
-    recipient: clientName || "", // Tenta usar na inicialização
+    recipient: clientName || "",
   });
 
-  // --- 2. EFEITO PARA GARANTIR O PREENCHIMENTO (CORRIGIDO) ---
   useEffect(() => {
-    // Atualiza o destinatário sempre que o clientName mudar (enquanto digita no Step 1)
     if (clientName) {
       setFormData((prev) => ({ ...prev, recipient: clientName }));
     }
   }, [clientName]);
 
   const [loadingCep, setLoadingCep] = useState(false);
-
-  // Estados de Validação
   const [errors, setErrors] = useState<any>({});
   const [touched, setTouched] = useState<any>({});
 
-  // --- VALIDAÇÕES ---
   const validators = {
     cep: (value: string) => value.replace(/\D/g, "").length === 8,
     street: (value: string) => value.trim().length > 0,
@@ -81,7 +74,6 @@ export default function Step2_Delivery({
     complement: () => true,
   };
 
-  // --- HANDLERS DE FORMULÁRIO ---
   const handleChange = (field: keyof Address, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -101,7 +93,6 @@ export default function Step2_Delivery({
     setErrors((prev: any) => ({ ...prev, [field]: !isValid }));
   };
 
-  // --- BUSCAR CEP ---
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value
       .replace(/\D/g, "")
@@ -118,7 +109,7 @@ export default function Step2_Delivery({
       setLoadingCep(true);
       try {
         const res = await fetch(
-          `https://viacep.com.br/ws/${value.replace(/\D/g, "")}/json/`
+          `https://viacep.com.br/ws/${value.replace(/\D/g, "")}/json/`,
         );
         const data = await res.json();
         if (!data.erro) {
@@ -158,7 +149,6 @@ export default function Step2_Delivery({
     }
   };
 
-  // --- CRUD ENDEREÇO ---
   const handleEditAddress = (addr: Address, e: React.MouseEvent) => {
     e.stopPropagation();
     setFormData(addr);
@@ -219,7 +209,7 @@ export default function Step2_Delivery({
     let savedId = formData.id;
 
     const existingIndex = savedAddresses.findIndex(
-      (addr) => addr.id === formData.id
+      (addr) => addr.id === formData.id,
     );
 
     if (existingIndex >= 0) {
@@ -236,7 +226,6 @@ export default function Step2_Delivery({
     setAddress(formData);
     setView("list");
 
-    // Reset do formulário
     setFormData({
       id: "",
       cep: "",
@@ -246,13 +235,12 @@ export default function Step2_Delivery({
       neighborhood: "",
       city: "",
       state: "",
-      recipient: clientName || "", // Reseta para o nome do cliente
+      recipient: clientName || "",
     });
     setTouched({});
     setErrors({});
   };
 
-  // Helper Check Icon
   const RenderCheckIcon = () => (
     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in fade-in zoom-in duration-200">
       <svg
@@ -270,14 +258,12 @@ export default function Step2_Delivery({
     </div>
   );
 
-  // --- RENDERIZAÇÃO ---
-
   // 1. ESTADO FECHADO (RESUMO FINAL)
   if (currentStep > 2) {
     const activeAddr =
       savedAddresses.find((a) => a.id === selectedAddressId) || address;
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex items-start justify-between transition-all mt-4">
+      <div className="bg-card border border-border rounded-2xl p-6 flex items-start justify-between transition-all mt-4">
         <div className="flex gap-4">
           <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0 mt-1">
             <svg
@@ -296,13 +282,13 @@ export default function Step2_Delivery({
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-white text-sm uppercase mb-1 pt-1">
+            <h3 className="font-bold text-foreground text-sm uppercase mb-1 pt-1">
               Entrega
             </h3>
-            <div className="text-zinc-400 text-sm space-y-0.5">
+            <div className="text-muted-foreground text-sm space-y-0.5">
               {activeAddr && activeAddr.street ? (
                 <>
-                  <p className="text-white font-medium">
+                  <p className="text-foreground font-medium">
                     {activeAddr.street}, {activeAddr.number}
                   </p>
                   <p>
@@ -310,9 +296,9 @@ export default function Step2_Delivery({
                     {activeAddr.state}
                   </p>
                   <p>{activeAddr.cep}</p>
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Destinatário:{" "}
-                    <span className="text-zinc-300">
+                    <span className="text-foreground">
                       {activeAddr.recipient}
                     </span>
                   </p>
@@ -336,7 +322,7 @@ export default function Step2_Delivery({
         </div>
         <button
           onClick={() => goToStep(2)}
-          className="p-2 hover:bg-zinc-800 rounded-full group transition-colors mt-1"
+          className="p-2 hover:bg-muted rounded-full group transition-colors mt-1"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -344,7 +330,7 @@ export default function Step2_Delivery({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-5 h-5 text-zinc-500 group-hover:text-sky-400 transition-colors"
+            className="w-5 h-5 text-muted-foreground group-hover:text-sky-500 transition-colors"
           >
             <path
               strokeLinecap="round"
@@ -360,12 +346,12 @@ export default function Step2_Delivery({
   // 2. ESTADO INATIVO
   if (currentStep < 2) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mt-4 opacity-50 grayscale select-none pointer-events-none">
+      <div className="bg-card border border-border rounded-2xl p-5 mt-4 opacity-50 grayscale select-none pointer-events-none">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-zinc-950 border border-zinc-700 text-white flex items-center justify-center text-xs font-bold">
+          <div className="w-6 h-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center text-xs font-bold">
             2
           </div>
-          <h2 className="text-white font-bold text-sm tracking-wide uppercase">
+          <h2 className="text-foreground font-bold text-sm tracking-wide uppercase">
             Entrega
           </h2>
         </div>
@@ -376,18 +362,18 @@ export default function Step2_Delivery({
   // 3. ESTADO ATIVO
   return (
     <div
-      className={`bg-zinc-900 border rounded-2xl overflow-hidden transition-all duration-300 mt-4 ${
+      className={`bg-card border rounded-2xl overflow-hidden transition-all duration-300 mt-4 ${
         currentStep === 2
           ? "border-sky-500 ring-1 ring-sky-500/20 shadow-xl shadow-sky-900/10"
-          : "border-zinc-800"
+          : "border-border"
       }`}
     >
-      <div className="p-5 border-b border-zinc-800 bg-zinc-900/50 flex items-center justify-between">
+      <div className="p-5 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-zinc-950 border border-zinc-700 text-white flex items-center justify-center text-xs font-bold shadow-inner">
+          <div className="w-6 h-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center text-xs font-bold shadow-inner">
             2
           </div>
-          <h2 className="text-white font-bold text-sm tracking-wide uppercase">
+          <h2 className="text-foreground font-bold text-sm tracking-wide uppercase">
             Entrega
           </h2>
         </div>
@@ -407,7 +393,7 @@ export default function Step2_Delivery({
                 className={`relative p-5 rounded-xl border cursor-pointer transition-all flex items-start gap-4 group ${
                   selectedAddressId === addr.id
                     ? "bg-sky-500/10 border-sky-500"
-                    : "bg-zinc-950 border-zinc-800 hover:border-zinc-700"
+                    : "bg-background border-border hover:border-muted-foreground"
                 }`}
               >
                 {/* Ícone de Seleção */}
@@ -415,7 +401,7 @@ export default function Step2_Delivery({
                   className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-1 transition-colors ${
                     selectedAddressId === addr.id
                       ? "border-sky-500"
-                      : "border-zinc-600"
+                      : "border-muted-foreground"
                   }`}
                 >
                   {selectedAddressId === addr.id && (
@@ -425,22 +411,21 @@ export default function Step2_Delivery({
 
                 {/* Conteúdo do Card */}
                 <div className="flex-1 space-y-3">
-                  {/* Endereço */}
                   <div>
-                    <p className="text-white text-sm font-medium">
+                    <p className="text-foreground text-sm font-medium">
                       {addr.street}, {addr.number} - {addr.neighborhood}
                     </p>
-                    <p className="text-zinc-400 text-xs">
+                    <p className="text-muted-foreground text-xs">
                       CEP {addr.cep} - {addr.city}/{addr.state}
                     </p>
                     {addr.complement && (
-                      <p className="text-zinc-500 text-[11px] mt-0.5">
+                      <p className="text-muted-foreground text-[11px] mt-0.5">
                         Comp: {addr.complement}
                       </p>
                     )}
-                    <p className="text-zinc-400 text-xs mt-1">
+                    <p className="text-muted-foreground text-xs mt-1">
                       Destinatário:{" "}
-                      <span className="text-white font-medium">
+                      <span className="text-foreground font-medium">
                         {addr.recipient}
                       </span>
                     </p>
@@ -451,7 +436,7 @@ export default function Step2_Delivery({
                 <div className="flex flex-col gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={(e) => handleEditAddress(addr, e)}
-                    className="text-zinc-500 hover:text-sky-400 transition-colors"
+                    className="text-muted-foreground hover:text-sky-400 transition-colors"
                     title="Editar"
                   >
                     <svg
@@ -471,7 +456,7 @@ export default function Step2_Delivery({
                   </button>
                   <button
                     onClick={(e) => handleDeleteAddress(addr.id, e)}
-                    className="text-zinc-500 hover:text-red-500 transition-colors"
+                    className="text-muted-foreground hover:text-red-500 transition-colors"
                     title="Excluir"
                   >
                     <svg
@@ -504,7 +489,7 @@ export default function Step2_Delivery({
                   neighborhood: "",
                   city: "",
                   state: "",
-                  recipient: clientName || "", // Reseta para o nome do cliente
+                  recipient: clientName || "",
                 });
                 setTouched({});
                 setErrors({});
@@ -516,8 +501,8 @@ export default function Step2_Delivery({
             </button>
 
             {/* SELEÇÃO FRETE */}
-            <div className="pt-6 mt-4 border-t border-zinc-800">
-              <p className="text-[11px] text-zinc-500 mb-3 uppercase font-bold tracking-wider">
+            <div className="pt-6 mt-4 border-t border-border">
+              <p className="text-[11px] text-muted-foreground mb-3 uppercase font-bold tracking-wider">
                 Escolha a entrega:
               </p>
               <div
@@ -525,7 +510,7 @@ export default function Step2_Delivery({
                 className={`cursor-pointer p-4 rounded-xl border flex items-center justify-between transition-all mb-3 ${
                   shippingMethod === "free"
                     ? "bg-sky-500/10 border-green-500"
-                    : "bg-zinc-950 border-zinc-800 hover:border-zinc-700"
+                    : "bg-background border-border hover:border-muted-foreground"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -533,7 +518,7 @@ export default function Step2_Delivery({
                     className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
                       shippingMethod === "free"
                         ? "border-green-500"
-                        : "border-zinc-600"
+                        : "border-muted-foreground"
                     }`}
                   >
                     {shippingMethod === "free" && (
@@ -541,10 +526,10 @@ export default function Step2_Delivery({
                     )}
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-white block">
+                    <span className="text-sm font-bold text-foreground block">
                       Frete Grátis
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-muted-foreground">
                       7 a 15 dias úteis
                     </span>
                   </div>
@@ -556,7 +541,7 @@ export default function Step2_Delivery({
                 className={`cursor-pointer p-4 rounded-xl border flex items-center justify-between transition-all ${
                   shippingMethod === "express"
                     ? "bg-sky-500/10 border-sky-500"
-                    : "bg-zinc-950 border-zinc-800 hover:border-zinc-700"
+                    : "bg-background border-border hover:border-muted-foreground"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -564,7 +549,7 @@ export default function Step2_Delivery({
                     className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
                       shippingMethod === "express"
                         ? "border-sky-500"
-                        : "border-zinc-600"
+                        : "border-muted-foreground"
                     }`}
                   >
                     {shippingMethod === "express" && (
@@ -572,15 +557,17 @@ export default function Step2_Delivery({
                     )}
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-white block">
+                    <span className="text-sm font-bold text-foreground block">
                       SEDEX Expresso
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-muted-foreground">
                       2 a 5 dias úteis
                     </span>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-white">R$ 14,90</span>
+                <span className="text-sm font-bold text-foreground">
+                  R$ 14,90
+                </span>
               </div>
             </div>
 
@@ -613,7 +600,7 @@ export default function Step2_Delivery({
             {savedAddresses.length > 0 && (
               <button
                 onClick={() => setView("list")}
-                className="mb-2 text-xs text-zinc-500 hover:text-white flex items-center gap-1"
+                className="mb-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
               >
                 ← Voltar para lista
               </button>
@@ -621,7 +608,7 @@ export default function Step2_Delivery({
 
             {/* CEP */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                 CEP
               </label>
               <div className="relative group">
@@ -629,7 +616,7 @@ export default function Step2_Delivery({
                   type="text"
                   placeholder="00000-000"
                   maxLength={9}
-                  className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 text-sm text-white placeholder-zinc-600 outline-none transition-all
+                  className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all
                   ${
                     touched.cep && !errors.cep
                       ? "border-green-500 focus:border-green-500"
@@ -638,7 +625,7 @@ export default function Step2_Delivery({
                   ${
                     touched.cep && errors.cep
                       ? "border-red-500 focus:border-red-500"
-                      : "border-zinc-800 focus:border-sky-500"
+                      : "border-border focus:border-sky-500"
                   }
                   `}
                   value={formData.cep}
@@ -664,7 +651,7 @@ export default function Step2_Delivery({
             {formData.street && (
               <div className="space-y-4 animate-in fade-in zoom-in duration-300">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                     Endereço
                   </label>
                   <div className="relative">
@@ -672,7 +659,7 @@ export default function Step2_Delivery({
                       type="text"
                       disabled
                       value={formData.street}
-                      className="w-full h-12 bg-zinc-800 border border-green-500/30 rounded-lg px-4 text-sm text-zinc-300 cursor-not-allowed"
+                      className="w-full h-12 bg-muted/20 border border-green-500/30 rounded-lg px-4 text-sm text-muted-foreground cursor-not-allowed"
                     />
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500/50">
                       <svg
@@ -693,13 +680,13 @@ export default function Step2_Delivery({
 
                 <div className="grid grid-cols-5 gap-3">
                   <div className="col-span-2 space-y-1">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                       Número
                     </label>
                     <div className="relative group">
                       <input
                         type="text"
-                        className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 text-sm text-white outline-none transition-all
+                        className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none transition-all
                             ${
                               touched.number && !errors.number
                                 ? "border-green-500 focus:border-green-500"
@@ -708,7 +695,7 @@ export default function Step2_Delivery({
                             ${
                               touched.number && errors.number
                                 ? "border-red-500 focus:border-red-500"
-                                : "border-zinc-800 focus:border-sky-500"
+                                : "border-border focus:border-sky-500"
                             }
                         `}
                         value={formData.number}
@@ -740,13 +727,13 @@ export default function Step2_Delivery({
                   </div>
 
                   <div className="col-span-3 space-y-1">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                       Complemento
                     </label>
                     <input
                       type="text"
                       placeholder="Opcional"
-                      className="w-full h-12 bg-zinc-950 border border-zinc-800 rounded-lg px-4 text-sm text-white focus:border-sky-500 outline-none"
+                      className="w-full h-12 bg-background border border-border rounded-lg px-4 text-sm text-foreground focus:border-sky-500 outline-none"
                       value={formData.complement}
                       onChange={(e) =>
                         handleChange("complement", e.target.value)
@@ -757,38 +744,38 @@ export default function Step2_Delivery({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                       Bairro
                     </label>
                     <input
                       type="text"
                       disabled
                       value={formData.neighborhood}
-                      className="w-full h-12 bg-zinc-800 border border-zinc-800 rounded-lg px-4 text-sm text-zinc-400"
+                      className="w-full h-12 bg-muted/20 border border-border rounded-lg px-4 text-sm text-muted-foreground"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                       Cidade
                     </label>
                     <input
                       type="text"
                       disabled
                       value={`${formData.city} - ${formData.state}`}
-                      className="w-full h-12 bg-zinc-800 border border-zinc-800 rounded-lg px-4 text-sm text-zinc-400"
+                      className="w-full h-12 bg-muted/20 border border-border rounded-lg px-4 text-sm text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
                     Destinatário
                   </label>
                   <div className="relative group">
                     <input
                       type="text"
                       placeholder="Nome de quem vai receber"
-                      className={`w-full h-12 bg-zinc-950 border rounded-lg px-4 text-sm text-white outline-none transition-all
+                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none transition-all
                                 ${
                                   touched.recipient && !errors.recipient
                                     ? "border-green-500 focus:border-green-500"
@@ -797,7 +784,7 @@ export default function Step2_Delivery({
                                 ${
                                   touched.recipient && errors.recipient
                                     ? "border-red-500 focus:border-red-500"
-                                    : "border-zinc-800 focus:border-sky-500"
+                                    : "border-border focus:border-sky-500"
                                 }
                             `}
                       value={formData.recipient}

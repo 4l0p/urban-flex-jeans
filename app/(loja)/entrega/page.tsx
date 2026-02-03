@@ -2,29 +2,31 @@ import React from "react";
 
 export default function EntregaPage() {
   return (
-    <main className="bg-zinc-950 min-h-screen pt-32 pb-20 text-gray-300">
+    // CAMADA 1: Fundo Global e Texto Padrão
+    <main className="bg-background min-h-screen pt-32 pb-20 text-muted-foreground transition-colors duration-300">
       {/* Cabeçalho */}
       <section className="max-w-4xl mx-auto px-6 text-center mb-16">
         <span className="text-sky-500 font-bold tracking-[0.2em] uppercase text-sm font-alt">
           Logística Global
         </span>
-        <h1 className="text-3xl md:text-5xl font-black text-white mt-4 font-alt tracking-tight">
+        <h1 className="text-3xl md:text-5xl font-black text-foreground mt-4 font-alt tracking-tight">
           POLÍTICA DE <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
             ENTREGA
           </span>
         </h1>
-        <p className="text-zinc-400 mt-6 max-w-2xl mx-auto">
+        <p className="text-muted-foreground mt-6 max-w-2xl mx-auto">
           Enviamos nossos produtos diretamente de nossos armazéns internacionais
           parceiros. Transparência e segurança do pedido até a sua porta.
         </p>
       </section>
 
-      {/* Destaques (Item 1) */}
+      {/* Destaques (Cards) */}
       <section className="max-w-6xl mx-auto px-6 mb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card Prazo */}
-          <div className="bg-zinc-900/30 border border-zinc-800 p-6 rounded-xl relative group hover:border-sky-500/30 transition-all">
+          {/* CARD 1: Prazo */}
+          {/* bg-card: Resolve automaticamente Branco (Light) e Zinc-900 (Dark) */}
+          <div className="bg-card border border-border p-6 rounded-xl relative group hover:border-sky-500/30 transition-all shadow-sm">
             <div className="text-sky-500 mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -41,20 +43,20 @@ export default function EntregaPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-white font-bold text-lg font-alt mb-2">
+            <h3 className="text-foreground font-bold text-lg font-alt mb-2">
               Prazo de Entrega
             </h3>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-muted-foreground">
               Média de{" "}
-              <strong className="text-white">10 a 20 dias úteis</strong>.
+              <strong className="text-foreground">10 a 20 dias úteis</strong>.
             </p>
-            <p className="text-xs text-zinc-500 mt-2">
-              Pode variar conforme localidade e condições alfandegárias.
+            <p className="text-xs text-muted-foreground mt-2 opacity-80">
+              Pode variar conforme localidade.
             </p>
           </div>
 
-          {/* Card Frete */}
-          <div className="bg-zinc-900/30 border border-zinc-800 p-6 rounded-xl relative group hover:border-sky-500/30 transition-all">
+          {/* CARD 2: Frete */}
+          <div className="bg-card border border-border p-6 rounded-xl relative group hover:border-sky-500/30 transition-all shadow-sm">
             <div className="text-sky-500 mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -71,20 +73,20 @@ export default function EntregaPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-white font-bold text-lg font-alt mb-2">
+            <h3 className="text-foreground font-bold text-lg font-alt mb-2">
               Custo de Frete
             </h3>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-muted-foreground">
               <span className="text-green-500 font-bold">Frete Grátis</span>{" "}
               acima de R$ 149,00.
             </p>
-            <p className="text-xs text-zinc-500 mt-2">
-              Pedidos abaixo desse valor: taxa fixa de R$ 9,90.
+            <p className="text-xs text-muted-foreground mt-2 opacity-80">
+              Pedidos abaixo: taxa fixa de R$ 9,90.
             </p>
           </div>
 
-          {/* Card Rastreio */}
-          <div className="bg-zinc-900/30 border border-zinc-800 p-6 rounded-xl relative group hover:border-sky-500/30 transition-all">
+          {/* CARD 3: Rastreio */}
+          <div className="bg-card border border-border p-6 rounded-xl relative group hover:border-sky-500/30 transition-all shadow-sm">
             <div className="text-sky-500 mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -101,35 +103,34 @@ export default function EntregaPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-white font-bold text-lg font-alt mb-2">
+            <h3 className="text-foreground font-bold text-lg font-alt mb-2">
               Rastreamento
             </h3>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-muted-foreground">
               Código enviado em{" "}
-              <strong className="text-white">3 a 5 dias úteis</strong>.
+              <strong className="text-foreground">3 a 5 dias úteis</strong>.
             </p>
-            <p className="text-xs text-zinc-500 mt-2">
-              Graças à nossa parceria cross-border, os envios chegam mais
-              rápido.
+            <p className="text-xs text-muted-foreground mt-2 opacity-80">
+              Envios monitorados passo a passo.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Áreas e Taxas (Item 2) */}
+      {/* Áreas e Taxas */}
       <section className="max-w-4xl mx-auto px-6 mb-16 space-y-8">
-        <h2 className="text-2xl font-bold text-white font-alt border-l-4 border-sky-500 pl-4">
+        <h2 className="text-2xl font-bold text-foreground font-alt border-l-4 border-sky-500 pl-4">
           Áreas de Entrega e Taxas
         </h2>
 
-        <div className="space-y-6 text-zinc-400 leading-relaxed">
+        <div className="space-y-6 text-muted-foreground leading-relaxed">
           <p>
             Atendemos todos os CEPs cobertos pelos Correios no Brasil.
             Garantimos a entrega ou reembolso integral em casos de extravio.
           </p>
 
-          <div className="bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
-            <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+          <div className="bg-card p-6 rounded-lg border border-border">
+            <h3 className="text-foreground font-bold mb-2 flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -148,10 +149,9 @@ export default function EntregaPage() {
             </h3>
             <p className="text-sm mb-2">
               Se seu pedido for tributado pela Receita Federal, os Correios
-              enviarão uma notificação com o valor do imposto (geralmente até
-              60% do valor declarado) e instruções para retirada.
+              enviarão uma notificação.
             </p>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-muted-foreground/80">
               * Em casos raros de tributação excessiva, orientamos contestar o
               valor diretamente nos Correios.
             </p>
@@ -159,28 +159,28 @@ export default function EntregaPage() {
         </div>
       </section>
 
-      {/* Condições Gerais (Item 3) */}
+      {/* Condições Gerais */}
       <section className="max-w-4xl mx-auto px-6 mb-16">
-        <h2 className="text-2xl font-bold text-white font-alt border-l-4 border-sky-500 pl-4 mb-6">
+        <h2 className="text-2xl font-bold text-foreground font-alt border-l-4 border-sky-500 pl-4 mb-6">
           Condições Gerais
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h3 className="text-white font-bold mb-2">
+            <h3 className="text-foreground font-bold mb-2">
               Cuidados com o endereço
             </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Confira dados completos no checkout. Erros no endereço podem
-              resultar em devolução ao remetente, com custo de reenvio por sua
-              conta (R$ 15,00).
+              resultar em devolução ao remetente (custo de reenvio: R$ 15,00).
             </p>
           </div>
           <div>
-            <h3 className="text-white font-bold mb-2">Destinatário Ausente</h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
+            <h3 className="text-foreground font-bold mb-2">
+              Destinatário Ausente
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Os Correios tentam entregar 3 vezes. Sem sucesso, o pacote vai
-              para a agência mais próxima e deve ser retirado em até 7 dias
-              corridos.
+              para a agência mais próxima (prazo de retirada: 7 dias).
             </p>
           </div>
         </div>
@@ -188,8 +188,9 @@ export default function EntregaPage() {
 
       {/* Seguro Entrega (Item 4) */}
       <section className="max-w-4xl mx-auto px-6 mb-16">
-        <div className="bg-gradient-to-r from-sky-900/20 to-transparent border border-sky-500/20 p-6 rounded-xl">
-          <h2 className="text-xl font-bold text-white font-alt mb-4 flex items-center gap-2">
+        {/* CORREÇÃO: Usando variáveis semânticas bg-card e border-border */}
+        <div className="bg-card border border-border p-6 rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold text-foreground font-alt mb-4 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -206,22 +207,24 @@ export default function EntregaPage() {
             </svg>
             Seguro Entrega
           </h2>
-          <div className="space-y-4 text-zinc-300 text-sm">
+          <div className="space-y-4 text-muted-foreground text-sm">
             <p>
-              <strong className="text-white">Express + Seguro:</strong>{" "}
+              <strong className="text-foreground">Express + Seguro:</strong>{" "}
               Reembolso ou reenvio se a entrega ultrapassar 60 dias úteis.
             </p>
             <p>
-              <strong className="text-white">Express:</strong> Entrega
+              <strong className="text-foreground">Express:</strong> Entrega
               prioritária sem cobertura adicional.
             </p>
-            <div className="bg-black/20 p-4 rounded mt-4">
-              <p className="text-xs text-zinc-500 uppercase font-bold mb-1">
+
+            {/* Box exceções - Mantido o original que escurece o fundo */}
+            <div className="bg-black/5 dark:bg-black/20 p-4 rounded mt-4">
+              <p className="text-xs text-muted-foreground uppercase font-bold mb-1">
                 Exceções para reembolso:
               </p>
-              <ul className="list-disc list-inside text-xs text-zinc-400">
-                <li>Atraso superior a 15 dias na liberação alfandegária.</li>
-                <li>Não retirada do produto (quando há taxas pendentes).</li>
+              <ul className="list-disc list-inside text-xs text-muted-foreground">
+                <li>Atraso na liberação alfandegária ({">"} 15 dias).</li>
+                <li>Não retirada do produto.</li>
                 <li>Tentativas de entrega frustradas.</li>
               </ul>
             </div>
@@ -229,50 +232,35 @@ export default function EntregaPage() {
         </div>
       </section>
 
-      {/* FAQ (Item 5) */}
+      {/* FAQ */}
       <section className="max-w-4xl mx-auto px-6 mb-16">
-        <h2 className="text-2xl font-bold text-white font-alt mb-8">
+        <h2 className="text-2xl font-bold text-foreground font-alt mb-8">
           Perguntas Frequentes
         </h2>
         <div className="space-y-6">
-          <div className="border-b border-zinc-800 pb-4">
-            <h4 className="text-white font-bold mb-1">
+          <div className="border-b border-border pb-4">
+            <h4 className="text-foreground font-bold mb-1">
               Posso confiar na entrega?
             </h4>
-            <p className="text-sm text-zinc-400">
-              Temos 10 anos de experiência em comércio global, com transparência
-              e compromisso. Entrega 100% segura.
+            <p className="text-sm text-muted-foreground">
+              Temos 10 anos de experiência em comércio global. Entrega 100%
+              segura.
             </p>
           </div>
-
-          <div className="border-b border-zinc-800 pb-4">
-            <h4 className="text-white font-bold mb-1">
-              Meu pedido está "parado na alfândega". O que fazer?
+          <div className="border-b border-border pb-4">
+            <h4 className="text-foreground font-bold mb-1">
+              Pedido parado na alfândega?
             </h4>
-            <p className="text-sm text-zinc-400">
-              É normal! A Receita Federal pode levar alguns dias para vistoriar.
-              Aguarde a liberação.
+            <p className="text-sm text-muted-foreground">
+              É normal. A Receita Federal pode levar alguns dias para vistoriar.
             </p>
           </div>
-
-          <div className="border-b border-zinc-800 pb-4">
-            <h4 className="text-white font-bold mb-1">
+          <div className="border-b border-border pb-4">
+            <h4 className="text-foreground font-bold mb-1">
               Mudei de endereço. E agora?
             </h4>
-            <p className="text-sm text-zinc-400">
-              Se o produto retornar para nós, cobramos um novo frete no valor de
-              R$15,00 para reenviar para seu novo endereço, gerando um novo
-              rastreio.
-            </p>
-          </div>
-
-          <div className="border-b border-zinc-800 pb-4">
-            <h4 className="text-white font-bold mb-1">
-              Comprei vários itens, mas só recebi parte.
-            </h4>
-            <p className="text-sm text-zinc-400">
-              Itens de fornecedores diferentes têm códigos de rastreio separados
-              e podem chegar em datas distintas.
+            <p className="text-sm text-muted-foreground">
+              Se retornar, cobramos um novo frete (R$15,00) para reenvio.
             </p>
           </div>
         </div>
@@ -280,8 +268,9 @@ export default function EntregaPage() {
 
       {/* ATENÇÃO (Box Final) */}
       <section className="max-w-4xl mx-auto px-6">
-        <div className="border-2 border-yellow-600/50 bg-yellow-900/10 p-8 rounded-xl text-center md:text-left">
-          <h2 className="text-yellow-500 font-bold text-xl font-alt mb-4 flex items-center justify-center md:justify-start gap-2">
+        {/* Box Amarelo adaptável */}
+        <div className="border-2 border-yellow-500/30 bg-yellow-50 dark:bg-yellow-900/10 p-8 rounded-xl text-center md:text-left">
+          <h2 className="text-yellow-600 dark:text-yellow-500 font-bold text-xl font-alt mb-4 flex items-center justify-center md:justify-start gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -298,27 +287,22 @@ export default function EntregaPage() {
             </svg>
             ATENÇÃO: Clientes do Brasil
           </h2>
-          <p className="text-zinc-300 text-sm leading-relaxed mb-4">
-            Desde 27/08/2018 os Correios cobram uma taxa fixa de{" "}
-            <strong>R$ 15,00</strong> para encomendas internacionais (Despacho
-            Postal). Esse valor <strong>NÃO É um imposto</strong>, mas uma taxa
-            de serviço.
+          <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+            A taxa de despacho postal (
+            <strong className="text-foreground">R$ 15,00</strong>) cobrada pelos
+            Correios NÃO é um imposto, mas uma taxa de serviço.
           </p>
-          <p className="text-zinc-400 text-xs leading-relaxed">
-            O pagamento deve ser feito diretamente no site dos Correios (Minhas
-            Importações). É fundamental acompanhar o envio pelo código de
-            rastreamento para saber quando pagar essa taxa e liberar sua
-            entrega. O rastreio fica disponível em sua conta em um prazo de 3 a
-            12 dias úteis.
+          <p className="text-muted-foreground text-xs leading-relaxed opacity-80">
+            Pagamento direto no site dos Correios (Minhas Importações).
           </p>
         </div>
       </section>
 
       {/* Footer da Página */}
-      <div className="text-center mt-20 border-t border-zinc-900 pt-10">
+      <div className="text-center mt-20 border-t border-border pt-10">
         <a
           href="/"
-          className="text-sky-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+          className="text-sky-500 hover:text-foreground transition-colors text-sm font-bold uppercase tracking-widest"
         >
           Voltar para a Loja
         </a>
