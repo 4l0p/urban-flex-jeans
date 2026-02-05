@@ -1,0 +1,80 @@
+// Configuração do Cliente Prisma (Javascript/Typescript)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Configuração da Conexão com o Banco (Lê do arquivo .env)
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- NOSSAS TABELAS (MODELS) ---
+
+// 1. O Pedido (Coração do sistema)
+model Order {
+  id              String      @id @default(uuid()) // ID único (ex: 550e8400-e29b...)
+  createdAt       DateTime    @default(now())      // Data da compra
+  updatedAt       DateTime    @updatedAt           // Última atualização
+  
+  // Status do pedido (para seu Admin)
+  status          String      @default("PENDING")  // PENDING, PAID, SHIPPED, CANCELED
+  
+  // Dados financeiros
+  totalAmount     Float       // Valor total final
+  paymentMethod   String      // credit, pix, boleto
+  
+  // Relacionamentos (Conexões)
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  customerId      String
+  
+  address         Address?    // O endereço pode ser opcional se falhar algo, mas geralmente existe
+  
+  items           OrderItem[] // Um pedido pode ter vários itens (no futuro)
+
+  @@map("orders") // Nome da tabela no banco
+}
+
+// 2. O Cliente
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  cpf       String
+  phone     String
+  
+  orders    Order[]  // Um cliente pode ter vários pedidos
+
+  @@map("customers")
+}
+
+// 3. O Endereço de Entrega
+model Address {
+  id           String  @id @default(uuid())
+  street       String
+  number       String
+  complement   String? // Opcional
+  neighborhood String
+  city         String
+  state        String
+  cep          String
+  
+  order        Order   @relation(fields: [orderId], references: [id])
+  orderId      String  @unique // Um endereço pertence a um pedido específico
+
+  @@map("addresses")
+}
+
+// 4. Itens do Pedido (Produto comprado)
+model OrderItem {
+  id          String  @id @default(uuid())
+  productName String  // "Kit 2 Camisas Urban Flex"
+  size        String  // "M", "G", etc.
+  quantity    Int
+  price       Float   // Preço unitário no momento da compra
+  
+  order       Order   @relation(fields: [orderId], references: [id])
+  orderId     String
+
+  @@map("order_items")
+}
