@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Montserrat, Inter } from "next/font/google";
-import { APP_THEME } from "@/lib/config"; // <--- Importamos a configuração
+import { Providers } from "./providers"; // <--- Importamos o Providers que você criou no passo anterior
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -24,17 +24,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    /* AQUI APLICAMOS A CLASSE 'dark' ou 'light' baseada na config */
-    <html lang="pt-BR" className={APP_THEME} suppressHydrationWarning>
+    /* 1. Removemos a classe fixa {APP_THEME}. 
+       2. O 'next-themes' vai injetar 'dark' ou 'light' aqui automaticamente.
+       3. Mantemos o suppressHydrationWarning para evitar erros de renderização.
+    */
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
-        /* TROCAMOS: 'bg-zinc-950 text-white' 
-           POR: 'bg-background text-foreground' 
-           
-           Assim, o fundo muda sozinho dependendo do tema.
-        */
         className={`${inter.variable} ${montserrat.variable} font-sans bg-background text-foreground antialiased transition-colors duration-300`}
       >
-        {children}
+        {/* Envolvemos o children no Providers. 
+           Agora, qualquer botão dentro do site poderá trocar o tema globalmente.
+        */}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

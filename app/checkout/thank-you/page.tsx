@@ -10,12 +10,22 @@ export default function ThankYouPage() {
   const [orderId, setOrderId] = useState("");
 
   useEffect(() => {
-    const randomId = Math.floor(1000 + Math.random() * 9000);
-    setOrderId(`#UF-${randomId}`);
-
     const storedData = sessionStorage.getItem("checkoutData");
+
     if (storedData) {
-      setOrderData(JSON.parse(storedData));
+      const parsedData = JSON.parse(storedData);
+      setOrderData(parsedData);
+
+      // Usa o ID real do banco de dados (pegando só a primeira parte para ficar mais amigável)
+      if (parsedData.orderId) {
+        setOrderId(`#${parsedData.orderId.split("-")[0].toUpperCase()}`);
+      } else {
+        const randomId = Math.floor(1000 + Math.random() * 9000);
+        setOrderId(`#UF-${randomId}`);
+      }
+    } else {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      setOrderId(`#UF-${randomId}`);
     }
   }, []);
 

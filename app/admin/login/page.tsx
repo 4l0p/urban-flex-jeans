@@ -7,14 +7,39 @@ import { useRouter } from "next/navigation";
 export default function AdminLogin() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Estados para os campos
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    setError("");
+
+    // Criamos uma rota de API simples para validar para não expor a senha no navegador
+    try {
+      const res = await fetch("/api/admin/login", {
+        // O caminho agora inclui /api/
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Se deu certo, redireciona
+        router.push("/admin");
+      } else {
+        setError("E-mail ou senha incorretos.");
+      }
+    } catch (err) {
+      setError("Erro ao conectar com o servidor.");
+    } finally {
       setLoading(false);
-      router.push("/admin");
-    }, 1500);
+    }
   };
 
   return (
@@ -30,12 +55,21 @@ export default function AdminLogin() {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-3 rounded-lg text-center font-bold">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-bold text-muted-foreground uppercase mb-2">
               E-mail
             </label>
             <input
               type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-sky-500 transition-colors"
               placeholder="admin@urbanflex.com"
             />
@@ -46,6 +80,9 @@ export default function AdminLogin() {
             </label>
             <input
               type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-sky-500 transition-colors"
               placeholder="••••••••"
             />
@@ -54,9 +91,9 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-sky-500 hover:bg-sky-400 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20"
+            className="w-full bg-sky-500 hover:bg-sky-400 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 disabled:opacity-50"
           >
-            {loading ? "Acessando..." : "ENTRAR NO SISTEMA"}
+            {loading ? "Verificando..." : "ENTRAR NO SISTEMA"}
           </button>
         </form>
 

@@ -79,11 +79,9 @@ const SocialProof = () => (
 function CheckoutContent() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-
   const [selectedSize, setSelectedSize] = useState("M");
-  const [productPrice, setProductPrice] = useState(99.9);
+  const [productPrice, setProductPrice] = useState(99.9); // Preço inicial de segurança
   const [quantity, setQuantity] = useState(1);
-
   const [shippingMethod, setShippingMethod] = useState<"free" | "express">(
     "free",
   );
@@ -105,14 +103,32 @@ function CheckoutContent() {
   const [paymentMethod, setPaymentMethod] = useState<
     "credit" | "pix" | "boleto"
   >("credit");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- CONFIGURAÇÃO DO TIMER (AJUSTE AQUI SE PRECISAR) ---
-  // DICA: Para testar rápido, use { minutes: 0, seconds: 10 }
+  // Timer
   const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 10 });
-
   const [isExpired, setIsExpired] = useState(false);
   const [showExpiredText, setShowExpiredText] = useState(true);
 
+  // --- 1. BUSCA O PREÇO DO BANCO (PRIORIDADE MÁXIMA) ---
+  useEffect(() => {
+    async function fetchPrice() {
+      try {
+        const res = await fetch("/api/products/price");
+        const data = await res.json();
+        if (data.price) {
+          const freshPrice = Number(data.price);
+          setProductPrice(freshPrice);
+          console.log("Preço atualizado do banco:", freshPrice);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar preço dinâmico:", error);
+      }
+    }
+    fetchPrice();
+  }, []);
+
+  // --- 2. RECUPERA DADOS DA SESSÃO (EXCETO O PREÇO) ---
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedData = sessionStorage.getItem("checkoutData");
@@ -120,8 +136,8 @@ function CheckoutContent() {
         try {
           const data = JSON.parse(storedData);
           if (data.size) setSelectedSize(data.size);
-          if (data.price) setProductPrice(Number(data.price));
           if (data.shipping) setShippingMethod(data.shipping);
+          // Omitimos o data.price aqui para garantir que o useEffect anterior (do banco) mande no valor.
         } catch (error) {
           console.error(error);
         }
@@ -129,38 +145,29 @@ function CheckoutContent() {
     }
   }, []);
 
-  // --- 1. LÓGICA APENAS DA CONTAGEM REGRESSIVA ---
+  // --- Lógica do Timer (Mantida) ---
   useEffect(() => {
-    // Se já expirou, não precisamos mais rodar este timer de decremento
     if (isExpired) return;
-
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        // Checa se acabou
         if (prev.seconds === 0 && prev.minutes === 0) {
-          setIsExpired(true); // Marca como expirado e para este timer
+          setIsExpired(true);
           return prev;
         }
-
-        // Decrementa normal
-        if (prev.seconds === 0) {
+        if (prev.seconds === 0)
           return { minutes: prev.minutes - 1, seconds: 59 };
-        }
         return { ...prev, seconds: prev.seconds - 1 };
       });
     }, 1000);
-
     return () => clearInterval(timer);
-  }, [isExpired]); // Depende do isExpired para parar de rodar quando acabar
+  }, [isExpired]);
 
-  // --- 2. LÓGICA APENAS DA ALTERNÂNCIA (PISCA-PISCA) ---
   useEffect(() => {
-    // Só roda se o tempo tiver acabado
     if (isExpired) {
-      const toggleTimer = setInterval(() => {
-        setShowExpiredText((prev) => !prev);
-      }, 1500); // Alterna a cada 1.5 segundos (mais suave)
-
+      const toggleTimer = setInterval(
+        () => setShowExpiredText((prev) => !prev),
+        1500,
+      );
       return () => clearInterval(toggleTimer);
     }
   }, [isExpired]);
@@ -172,16 +179,16 @@ function CheckoutContent() {
   const nextStep = () => setCurrentStep((prev) => prev + 1);
 
   const handleFinishCheckout = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const totalProductPrice = productPrice * quantity;
-
       const cartItem = {
         name: "Kit 2 Camisas Urban Flex Jeans",
         size: selectedSize,
         quantity: quantity,
         price: productPrice,
       };
-
       const payload = {
         customer,
         address,
@@ -192,15 +199,12 @@ function CheckoutContent() {
 
       const response = await fetch("/api/checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       const data = await response.json();
-
-      if (data.success) {
+      if (response.ok && data.success) {
         const dataForThankYouPage = {
           customer,
           address,
@@ -211,38 +215,30 @@ function CheckoutContent() {
           quantity: quantity,
           orderId: data.orderId,
         };
-
         sessionStorage.setItem(
           "checkoutData",
           JSON.stringify(dataForThankYouPage),
         );
-
         router.push("/checkout/thank-you");
       } else {
-        alert("Houve um erro ao processar seu pedido. Tente novamente.");
-        console.error("Erro API:", data.error);
+        setIsSubmitting(false);
+        alert("Houve um erro ao processar seu pedido.");
       }
     } catch (error) {
-      console.error("Erro de conexão:", error);
+      setIsSubmitting(false);
       alert("Erro ao conectar com o servidor.");
     }
   };
 
   return (
     <div className="min-h-screen bg-background text-muted-foreground font-sans selection:bg-sky-500/30 transition-colors duration-300">
-      {/* HEADER + TIMER */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm shadow-xl shadow-black/20">
         <div className="bg-card text-center py-2 border-b border-border h-10 overflow-hidden relative">
-          {/* CONTAINER PARA OS TEXTOS ALTERNANTES */}
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* TEXTO NORMAL (ENQUANTO NÃO EXPIROU) */}
             <div
-              className={`absolute flex items-center justify-center gap-2 transition-opacity duration-500 ease-in-out ${
-                isExpired ? "opacity-0 invisible" : "opacity-100 visible"
-              }`}
+              className={`absolute flex items-center justify-center gap-2 transition-opacity duration-500 ease-in-out ${isExpired ? "opacity-0 invisible" : "opacity-100 visible"}`}
             >
               <p className="text-[10px] md:text-xs font-medium text-foreground flex items-center gap-2 animate-pulse">
-                {/* <span>⏱️ Oferta expira em</span> */}
                 <span className="flex items-center gap-1.5">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -266,27 +262,15 @@ function CheckoutContent() {
                 </span>
               </p>
             </div>
-
-            {/* TEXTO DE ALERTA 1: "00:00:00" (QUANDO EXPIROU E showExpiredText é TRUE) */}
             <div
-              className={`absolute transition-opacity duration-1000 ease-in-out ${
-                isExpired && showExpiredText
-                  ? "opacity-100 visible"
-                  : "opacity-0 invisible"
-              }`}
+              className={`absolute transition-opacity duration-1000 ease-in-out ${isExpired && showExpiredText ? "opacity-100 visible" : "opacity-0 invisible"}`}
             >
               <span className="text-red-500/80 font-mono font-bold text-xs md:text-sm tracking-widest">
                 00:00:00
               </span>
             </div>
-
-            {/* TEXTO DE ALERTA 2: FRASE DE IMPACTO (QUANDO EXPIROU E showExpiredText é FALSE) */}
             <div
-              className={`absolute transition-opacity duration-1000 ease-in-out ${
-                isExpired && !showExpiredText
-                  ? "opacity-100 visible"
-                  : "opacity-0 invisible"
-              }`}
+              className={`absolute transition-opacity duration-1000 ease-in-out ${isExpired && !showExpiredText ? "opacity-100 visible" : "opacity-0 invisible"}`}
             >
               <span className="flex items-center justify-center gap-1.5 text-zinc-600 font-black uppercase tracking-wide text-[10px] md:text-xs">
                 <svg
@@ -305,23 +289,18 @@ function CheckoutContent() {
                 </svg>
                 Última chamada para aproveitar a oferta!
               </span>
-              {/* <span className="text-zinc-600 font-bold uppercase tracking-wide text-[10px] md:text-xs">
-                ⚠️ Última chamada para aproveitar a oferta!
-              </span> */}
             </div>
           </div>
         </div>
-
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-14 md:h-20 flex items-center justify-between">
           <Link
             href="/"
             className="font-alt text-xl md:text-3xl font-black text-foreground tracking-tighter hover:opacity-90 transition-opacity flex items-center gap-1"
           >
             URBAN<span className="text-sky-500">FLEX</span>
-            <span className="hidden md:inline">JEANS</span>{" "}
+            <span className="hidden md:inline">JEANS</span>
             <span className="text-sky-500">.</span>
           </Link>
-
           <div className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-muted-foreground opacity-80 text-right leading-tight">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -337,46 +316,15 @@ function CheckoutContent() {
             </svg>
             <div className="whitespace-nowrap">
               PAGAMENTO
-              <br className="md:hidden" />
-              <span className="hidden md:inline"> </span>100% SEGURO
+              <br className="md:hidden" /> 100% SEGURO
             </div>
           </div>
         </div>
       </header>
 
-      {/* TRILHA DE PROGRESSO */}
-      <div className="md:hidden grid grid-cols-3 px-6 py-3 bg-background/80 border-b border-border mb-2 sticky top-[85px] z-40 backdrop-blur-md">
-        {[1, 2, 3].map((step) => (
-          <div
-            key={step}
-            className={`flex flex-col items-center gap-0.5 ${
-              currentStep === step ? "opacity-100" : "opacity-40"
-            }`}
-            onClick={() => step < currentStep && goToStep(step)}
-          >
-            <div
-              className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                currentStep === step
-                  ? "bg-foreground text-background scale-110 shadow-lg shadow-black/10"
-                  : step < currentStep
-                    ? "bg-green-500 text-white cursor-pointer"
-                    : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {step < currentStep ? "✓" : step}
-            </div>
-            <span className="text-[8px] uppercase font-bold tracking-wider">
-              {step === 1 ? "Dados" : step === 2 ? "Entrega" : "Pagamento"}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* GRID PRINCIPAL */}
       <main className="max-w-[1200px] mx-auto px-4 py-4 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* COLUNA 1 */}
         <div className="lg:col-span-4 space-y-4 order-2 lg:order-1">
-          <div className={`${currentStep === 1 ? "block" : "hidden lg:block"}`}>
+          <div className={currentStep === 1 ? "block" : "hidden lg:block"}>
             <Step1_Identification
               currentStep={currentStep}
               completeStep={nextStep}
@@ -385,8 +333,7 @@ function CheckoutContent() {
               goToStep={goToStep}
             />
           </div>
-
-          <div className={`${currentStep === 2 ? "block" : "hidden lg:block"}`}>
+          <div className={currentStep === 2 ? "block" : "hidden lg:block"}>
             <Step2_Delivery
               currentStep={currentStep}
               completeStep={nextStep}
@@ -398,15 +345,12 @@ function CheckoutContent() {
               clientName={customer.name}
             />
           </div>
-
           <div className="md:hidden block">
             {(currentStep === 1 || currentStep === 2) && <SocialProof />}
           </div>
         </div>
-
-        {/* COLUNA 2 */}
         <div className="lg:col-span-4 order-3 lg:order-2">
-          <div className={`${currentStep === 3 ? "block" : "hidden lg:block"}`}>
+          <div className={currentStep === 3 ? "block" : "hidden lg:block"}>
             <Step3_Payment
               currentStep={currentStep}
               paymentMethod={paymentMethod}
@@ -418,8 +362,6 @@ function CheckoutContent() {
             </div>
           </div>
         </div>
-
-        {/* COLUNA 3 */}
         <div className="lg:col-span-4 order-1 lg:order-3">
           <OrderSummary
             shippingMethod={shippingMethod}
@@ -435,7 +377,6 @@ function CheckoutContent() {
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="py-8 md:py-10 border-t border-border text-center bg-background mt-auto">
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-4">

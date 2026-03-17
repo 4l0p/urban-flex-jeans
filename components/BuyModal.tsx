@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useModal } from "../context/ModalContext";
 
@@ -14,11 +14,31 @@ export default function BuyModal() {
   const [loading, setLoading] = useState(false);
   const [sizeError, setSizeError] = useState(false);
 
+  // 1. ESTADO PARA O PREÇO DO BANCO
+  const [basePrice, setBasePrice] = useState(99.9);
+
   const sizes = ["PP", "P", "M", "G", "GG", "XG", "XGG"];
+
+  // 2. BUSCA O PREÇO ASSIM QUE O MODAL ABRE
+  useEffect(() => {
+    if (isOpen) {
+      async function fetchPrice() {
+        try {
+          const res = await fetch("/api/products/price");
+          const data = await res.json();
+          if (data.price) {
+            setBasePrice(Number(data.price));
+          }
+        } catch (error) {
+          console.error("Erro ao carregar preço no modal:", error);
+        }
+      }
+      fetchPrice();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const basePrice = 99.9;
   const totalPrice = basePrice + (shipping === "express" ? 14.9 : 0);
 
   const sizeData = [
@@ -52,7 +72,7 @@ export default function BuyModal() {
         JSON.stringify({
           size,
           shipping,
-          price: basePrice,
+          price: basePrice, // 3. AGORA ENVIA O PREÇO REAL DO BANCO
         }),
       );
     }
@@ -65,35 +85,26 @@ export default function BuyModal() {
 
   return (
     <div className="fixed inset-0 z-[110] flex justify-end">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={closeModal}
       />
 
-      {/* Sidebar - MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
       <div className="relative w-full max-w-md h-full bg-background border-l border-border shadow-2xl flex flex-col animate-slide-in-right transition-colors duration-300">
-        {/* Header Compacto - MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
         <div className="px-4 py-3 border-b border-border flex justify-between items-center bg-background shrink-0">
-          {/* MUDANÇA: text-white -> text-foreground */}
           <h2 className="text-base font-bold text-foreground tracking-tight">
             Kit 2 Camisas Urban Flex
           </h2>
           <button
             onClick={closeModal}
-            // MUDANÇA: text-gray-400 -> text-muted-foreground | hover:text-white -> hover:text-foreground
-            // MUDANÇA: bg-zinc-900 -> bg-muted/50 | hover:bg-zinc-800 -> hover:bg-muted
             className="text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted w-8 h-8 rounded-full flex items-center justify-center transition-colors"
           >
             ✕
           </button>
         </div>
 
-        {/* Conteúdo Principal */}
         <div className="flex-1 flex flex-col p-4 overflow-y-auto">
-          {/* Imagens (Altura h-28) */}
           <div className="flex gap-2 h-28 mb-3 shrink-0">
-            {/* MUDANÇA: border-zinc-800 -> border-border */}
             <div className="flex-1 relative rounded-lg overflow-hidden border border-border group">
               <img
                 src="https://4l0p.github.io/shirt/assets/azul_escuro_principal.png"
@@ -104,7 +115,6 @@ export default function BuyModal() {
                 Deep Blue
               </div>
             </div>
-            {/* MUDANÇA: border-zinc-800 -> border-border */}
             <div className="flex-1 relative rounded-lg overflow-hidden border border-border group">
               <img
                 src="https://4l0p.github.io/shirt/assets/azul_claro_principal.png"
@@ -117,11 +127,9 @@ export default function BuyModal() {
             </div>
           </div>
 
-          {/* Seleção de Tamanho */}
           <div className="mb-2 shrink-0">
             <div className="flex items-center justify-between mb-1.5">
               <span
-                // MUDANÇA: text-white -> text-foreground
                 className={`font-bold text-xs uppercase tracking-wider transition-colors duration-300 ${
                   sizeError ? "text-red-500 animate-pulse" : "text-foreground"
                 }`}
@@ -140,8 +148,6 @@ export default function BuyModal() {
                 <button
                   key={s}
                   onClick={() => handleSelectSize(s)}
-                  // MUDANÇA: border-zinc-800 -> border-border | bg-zinc-900 -> bg-muted/20
-                  // MUDANÇA: text-gray-400 -> text-muted-foreground
                   className={`h-9 rounded border font-bold transition-all text-xs flex items-center justify-center ${
                     size === s
                       ? "bg-sky-600 border-sky-600 text-white shadow-md shadow-sky-900/30 scale-105 z-10"
@@ -156,7 +162,6 @@ export default function BuyModal() {
             </div>
           </div>
 
-          {/* ÁREA DE MEDIDAS */}
           <div className="mb-2 shrink-0">
             {selectedSizeData ? (
               <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg p-2 animate-fade-in">
@@ -183,16 +188,13 @@ export default function BuyModal() {
                   {["Peito", "Ombro", "Comp", "Manga"].map((label) => {
                     const key = label.toLowerCase();
                     return (
-                      // MUDANÇA: bg-zinc-950/80 -> bg-background/80
                       <div
                         key={label}
                         className="bg-background/80 rounded p-1 border border-sky-500/10"
                       >
-                        {/* MUDANÇA: text-gray-500 -> text-muted-foreground */}
                         <span className="block text-[8px] text-muted-foreground uppercase">
                           {label}
                         </span>
-                        {/* MUDANÇA: text-white -> text-foreground */}
                         <span className="block text-xs font-bold text-foreground">
                           {
                             selectedSizeData[
@@ -206,13 +208,9 @@ export default function BuyModal() {
                 </div>
               </div>
             ) : (
-              // Tabela Completa Compacta
-              // MUDANÇA: border-zinc-800 -> border-border | bg-zinc-900/30 -> bg-muted/10
               <div className="border border-border rounded-lg bg-muted/10 overflow-hidden transition-all duration-300">
                 <button
                   onClick={() => setIsTableOpen(!isTableOpen)}
-                  // MUDANÇA: text-gray-400 -> text-muted-foreground | hover:text-white -> hover:text-foreground
-                  // MUDANÇA: bg-zinc-900 -> bg-muted/30 | hover:bg-zinc-800/50 -> hover:bg-muted/50
                   className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors bg-muted/30"
                 >
                   <span className="flex items-center gap-2 text-[10px]">
@@ -228,10 +226,8 @@ export default function BuyModal() {
                 </button>
 
                 {isTableOpen && (
-                  // MUDANÇA: border-zinc-800 -> border-border | bg-zinc-950/50 -> bg-background/50
                   <div className="border-t border-border bg-background/50 p-1">
                     <table className="w-full text-center text-[9px]">
-                      {/* MUDANÇA: text-zinc-500 -> text-muted-foreground | border-zinc-800 -> border-border */}
                       <thead className="text-muted-foreground font-bold border-b border-border">
                         <tr>
                           <th className="py-1">Tam</th>
@@ -241,16 +237,13 @@ export default function BuyModal() {
                           <th className="py-1">Manga</th>
                         </tr>
                       </thead>
-                      {/* MUDANÇA: divide-zinc-800/50 -> divide-border/50 */}
                       <tbody className="divide-y divide-border/50">
                         {sizeData.map((row) => (
                           <tr
                             key={row.tam}
                             onClick={() => handleSelectSize(row.tam)}
-                            // MUDANÇA: text-zinc-400 -> text-muted-foreground | hover:bg-zinc-800 -> hover:bg-muted/30 | hover:text-white -> hover:text-foreground
                             className="text-muted-foreground hover:bg-muted/30 cursor-pointer hover:text-foreground transition-colors"
                           >
-                            {/* MUDANÇA: text-white -> text-foreground */}
                             <td className="py-0.5 font-bold text-foreground">
                               {row.tam}
                             </td>
@@ -268,16 +261,13 @@ export default function BuyModal() {
             )}
           </div>
 
-          {/* Frete */}
           <div className="shrink-0 mt-auto">
-            {/* MUDANÇA: text-white -> text-foreground */}
             <span className="text-foreground font-bold text-xs uppercase tracking-wider mb-1.5 block">
               Envio
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setShipping("free")}
-                // MUDANÇA: bg-zinc-900 -> bg-muted/20 | border-zinc-800 -> border-border | hover:border-zinc-700 -> hover:border-muted-foreground
                 className={`p-2.5 rounded-lg border text-left transition-all relative ${
                   shipping === "free"
                     ? "bg-sky-500/10 border-green-500 shadow-[0_0_15px_rgba(14,165,233,0.1)]"
@@ -296,13 +286,11 @@ export default function BuyModal() {
                     <span className="text-green-500 text-[10px]">✓</span>
                   )}
                 </div>
-                {/* MUDANÇA: text-gray-500 -> text-muted-foreground */}
                 <p className="text-muted-foreground text-[9px]">7-15 dias</p>
               </button>
 
               <button
                 onClick={() => setShipping("express")}
-                // MUDANÇA: bg-zinc-900 -> bg-muted/20 | border-zinc-800 -> border-border
                 className={`p-2.5 rounded-lg border text-left transition-all relative ${
                   shipping === "express"
                     ? "bg-blue-600/10 border-blue-600"
@@ -329,13 +317,16 @@ export default function BuyModal() {
           </div>
         </div>
 
-        {/* Rodapé Fixo */}
-        {/* MUDANÇA: bg-zinc-950 -> bg-background | border-zinc-800 -> border-border */}
         <div className="p-4 border-t border-border bg-background shrink-0 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.1)]">
           <div className="flex justify-between items-end mb-3">
-            {/* MUDANÇA: text-gray-400 -> text-muted-foreground */}
             <div className="text-muted-foreground text-xs">
-              <p>Subtotal: R$ 99,90</p>
+              <p>
+                Subtotal:{" "}
+                {basePrice.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </p>
               <p
                 className={
                   shipping === "free" ? "text-green-600" : "text-sky-600"
@@ -345,7 +336,6 @@ export default function BuyModal() {
               </p>
             </div>
             <div className="text-right">
-              {/* MUDANÇA: text-gray-300 -> text-muted-foreground */}
               <p className="text-[10px] text-muted-foreground uppercase font-bold mb-0.5">
                 Total
               </p>
