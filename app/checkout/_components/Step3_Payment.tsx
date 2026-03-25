@@ -1,12 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Step3Props {
   currentStep: number;
   paymentMethod: "credit" | "pix" | "boleto";
   setPaymentMethod: (method: "credit" | "pix" | "boleto") => void;
   onFinish: () => void;
+  customer: any;
+  totalAmount: number;
+  // NOVA PROP NECESSÁRIA PARA O CARTÃO:
+  address: any;
 }
 
 export default function Step3_Payment({
@@ -14,7 +19,12 @@ export default function Step3_Payment({
   paymentMethod,
   setPaymentMethod,
   onFinish,
+  customer,
+  totalAmount,
+  address,
 }: Step3Props) {
+  const router = useRouter();
+
   const [cardData, setCardData] = useState({
     number: "",
     name: "",
@@ -35,7 +45,6 @@ export default function Step3_Payment({
     "idle" | "processing" | "success" | "error"
   >("idle");
 
-  // --- HELPERS (Luhn Check) ---
   const luhnCheck = (val: string) => {
     const clean = val.replace(/\D/g, "");
     let checksum = 0;
@@ -54,7 +63,6 @@ export default function Step3_Payment({
     return checksum % 10 === 0 && clean.length >= 13;
   };
 
-  // --- DETECÇÃO BANDEIRA ---
   const updateCardVisual = (number: string) => {
     const clean = number.replace(/\D/g, "");
     let brand = "CREDIT";
@@ -88,7 +96,6 @@ export default function Step3_Payment({
     setCardVisual({ brand, color });
   };
 
-  // --- VALIDAÇÕES ---
   const validators = {
     number: (value: string) => luhnCheck(value),
     name: (value: string) => value.trim().length >= 3,
@@ -113,7 +120,6 @@ export default function Step3_Payment({
     },
   };
 
-  // --- HANDLERS ---
   const handleCardMask = (
     e: React.ChangeEvent<HTMLInputElement>,
     field: string,
@@ -158,7 +164,19 @@ export default function Step3_Payment({
     setErrors((prev: any) => ({ ...prev, [field]: !isValid }));
   };
 
-  const handlePaymentSubmit = () => {
+  const formatExpiryForApi = (expiry: string) => {
+    // Transforma MM/YY para MM/YYYY que as APIs geralmente pedem
+    const [m, y] = expiry.split("/");
+    return `${m}/20${y}`;
+  };
+
+  // --- HANDLER PRINCIPAL (PIX E CARTÃO) ---
+  const handlePaymentSubmit = async () => {
+    if (paymentMethod === "boleto") {
+      alert("Boleto será implementado em breve!");
+      return;
+    }
+
     if (paymentMethod === "credit") {
       setTouched({ number: true, name: true, expiry: true, cvv: true });
       const numberValid = validators.number(cardData.number);
@@ -171,24 +189,114 @@ export default function Step3_Payment({
         expiry: !expiryValid,
         cvv: !cvvValid,
       });
+
       if (!numberValid || !nameValid || !expiryValid || !cvvValid) return;
+
+      setPaymentStatus("processing");
+
+      try {
+        // Monta o mega payload exigido pela Braspag/AWS
+        const payloadCredit = {
+          checkoutId: sessionStorage.getItem("checkoutId") || "",
+          cardNumber: cardData.number.replace(/\s/g, ""),
+          expirationDate: formatExpiryForApi(cardData.expiry),
+          cvv: cardData.cvv,
+          nomeNoCartao: cardData.name,
+          cpfTitular: customer.cpf.replace(/\D/g, ""), // Assumindo o CPF do cliente
+          parcelas: parseInt(cardData.installments),
+          seguro: false,
+          amountInCents: Math.round(totalAmount * 100), // Valor real em centavos
+          brand:
+            cardVisual.brand === "CREDIT"
+              ? "Mastercard"
+              : cardVisual.brand.charAt(0).toUpperCase() +
+                cardVisual.brand.slice(1).toLowerCase(),
+          email: customer.email,
+          celular: customer.phone.replace(/\D/g, ""),
+          cep: address.cep.replace(/\D/g, ""),
+          endereco: address.street,
+          numero: address.number,
+          bairro: address.neighborhood,
+          complemento: address.complement || "",
+          destinatario: address.recipient,
+        };
+
+        const response = await fetch("/api/checkout/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloadCredit),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setPaymentStatus("success");
+
+          // Salva os dados resumidos na sessão para a página de obrigado
+          sessionStorage.setItem(
+            "paymentSuccessData",
+            JSON.stringify(result.data),
+          );
+
+          setTimeout(() => {
+            onFinish();
+          }, 2500);
+        } else {
+          setPaymentStatus("error");
+          alert(`Pagamento não autorizado: ${result.message}`);
+        }
+      } catch (error) {
+        console.error("Erro no Cartão:", error);
+        setPaymentStatus("error");
+        alert("Falha de conexão ao processar pagamento.");
+      }
+      return;
     }
 
-    setPaymentStatus("processing");
+    if (paymentMethod === "pix") {
+      setPaymentStatus("processing");
+      try {
+        const desconto = totalAmount * 0.05;
+        const totalFinal = totalAmount - desconto;
 
-    setTimeout(() => {
-      setPaymentStatus("success");
-      setTimeout(() => {
-        onFinish();
-      }, 2500);
-    }, 3000);
+        const payloadPix = {
+          valor: totalFinal.toFixed(2),
+          descricao: "compra de camisa urbanflex com pix",
+          nomeCliente: customer?.name || "Cliente",
+          emailCliente: customer?.email || "",
+          cpf: customer?.cpf?.replace(/\D/g, "") || "",
+          checkoutPix: sessionStorage.getItem("checkoutId") || "",
+        };
+
+        const response = await fetch("/api/checkout/pix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloadPix),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setPaymentStatus("success");
+          sessionStorage.setItem("pixData", JSON.stringify(result.data));
+          setTimeout(() => {
+            onFinish();
+          }, 2500);
+        } else {
+          setPaymentStatus("error");
+          alert(`Erro ao gerar PIX: ${result.message}`);
+        }
+      } catch (error) {
+        console.error("Erro no PIX:", error);
+        setPaymentStatus("error");
+        alert("Falha de conexão ao gerar o PIX.");
+      }
+    }
   };
 
   const RenderCheckIcon = ({ customClass = "" }) => (
     <div
-      className={`absolute top-1/2 -translate-y-1/2 text-green-500 animate-in fade-in zoom-in duration-200 ${
-        customClass || "right-4"
-      }`}
+      className={`absolute top-1/2 -translate-y-1/2 text-green-500 animate-in fade-in zoom-in duration-200 ${customClass || "right-4"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +313,6 @@ export default function Step3_Payment({
     </div>
   );
 
-  // --- RENDERIZAÇÃO ---
   if (currentStep < 3) {
     return (
       <div className="bg-card border border-border rounded-2xl p-5 opacity-50 grayscale select-none pointer-events-none transition-all">
@@ -224,16 +331,18 @@ export default function Step3_Payment({
   return (
     <div className="bg-card border border-sky-500 ring-1 ring-sky-500/20 shadow-xl shadow-sky-900/10 rounded-2xl overflow-hidden transition-all duration-300 relative">
       {/* OVERLAYS */}
-      {paymentStatus !== "idle" && (
+      {paymentStatus !== "idle" && paymentStatus !== "error" && (
         <div className="absolute inset-0 z-50 bg-card/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300 p-6 text-center">
           {paymentStatus === "processing" && (
             <>
               <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-              <p className="text-foreground font-bold text-sm tracking-widest animate-pulse">
-                PROCESSANDO PAGAMENTO...
+              <p className="text-foreground font-bold text-sm tracking-widest animate-pulse uppercase">
+                {paymentMethod === "credit"
+                  ? "PROCESSANDO PAGAMENTO..."
+                  : "GERANDO PIX..."}
               </p>
               <p className="text-muted-foreground text-xs mt-2">
-                Estamos validando seus dados. Não feche esta tela.
+                Conectando ao banco central. Não feche esta tela.
               </p>
             </>
           )}
@@ -261,7 +370,9 @@ export default function Step3_Payment({
                 </svg>
               </div>
               <p className="text-green-500 font-black text-xl tracking-wide mb-1">
-                PAGAMENTO APROVADO!
+                {paymentMethod === "credit"
+                  ? "PAGAMENTO APROVADO!"
+                  : "PIX GERADO!"}
               </p>
               <p className="text-muted-foreground text-xs">
                 Redirecionando você...
@@ -297,31 +408,19 @@ export default function Step3_Payment({
         <div className="grid grid-cols-3 gap-1 p-1 bg-muted/20 rounded-lg border border-border mb-6">
           <button
             onClick={() => setPaymentMethod("credit")}
-            className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all ${
-              paymentMethod === "credit"
-                ? "bg-card text-foreground shadow-sm ring-1 ring-border"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all ${paymentMethod === "credit" ? "bg-card text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:text-foreground"}`}
           >
             Cartão
           </button>
           <button
             onClick={() => setPaymentMethod("pix")}
-            className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all flex flex-col items-center justify-center leading-none gap-0.5 ${
-              paymentMethod === "pix"
-                ? "bg-green-600 text-white shadow-sm ring-1 ring-white/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all flex flex-col items-center justify-center leading-none gap-0.5 ${paymentMethod === "pix" ? "bg-green-600 text-white shadow-sm ring-1 ring-white/10" : "text-muted-foreground hover:text-foreground"}`}
           >
             PIX <span className="text-[8px] opacity-80">-5% OFF</span>
           </button>
           <button
             onClick={() => setPaymentMethod("boleto")}
-            className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all flex flex-col items-center justify-center leading-none gap-0.5 ${
-              paymentMethod === "boleto"
-                ? "bg-blue-600 text-white shadow-sm ring-1 ring-white/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`py-2.5 text-[10px] font-bold uppercase rounded-md transition-all flex flex-col items-center justify-center leading-none gap-0.5 ${paymentMethod === "boleto" ? "bg-blue-600 text-white shadow-sm ring-1 ring-white/10" : "text-muted-foreground hover:text-foreground"}`}
           >
             Boleto <span className="text-[8px] opacity-80">-5% OFF</span>
           </button>
@@ -413,15 +512,7 @@ export default function Step3_Payment({
                     type="text"
                     placeholder="0000 0000 0000 0000"
                     maxLength={19}
-                    className={`w-full h-12 bg-background border rounded-lg px-4 pl-11 text-sm text-foreground outline-none transition-all placeholder-muted-foreground ${
-                      touched.number && !errors.number
-                        ? "border-green-500 focus:border-green-500"
-                        : ""
-                    } ${
-                      touched.number && errors.number
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-border focus:border-sky-500"
-                    }`}
+                    className={`w-full h-12 bg-background border rounded-lg px-4 pl-11 text-sm text-foreground outline-none transition-all placeholder-muted-foreground ${touched.number && !errors.number ? "border-green-500 focus:border-green-500" : ""} ${touched.number && errors.number ? "border-red-500 focus:border-red-500" : "border-border focus:border-sky-500"}`}
                     value={cardData.number}
                     onChange={(e) => handleCardMask(e, "number")}
                     onFocus={() => setIsFlipped(false)}
@@ -457,15 +548,7 @@ export default function Step3_Payment({
                   <input
                     type="text"
                     placeholder="COMO NO CARTÃO"
-                    className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none uppercase transition-all placeholder-muted-foreground ${
-                      touched.name && !errors.name
-                        ? "border-green-500 focus:border-green-500"
-                        : ""
-                    } ${
-                      touched.name && errors.name
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-border focus:border-sky-500"
-                    }`}
+                    className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none uppercase transition-all placeholder-muted-foreground ${touched.name && !errors.name ? "border-green-500 focus:border-green-500" : ""} ${touched.name && errors.name ? "border-red-500 focus:border-red-500" : "border-border focus:border-sky-500"}`}
                     value={cardData.name}
                     onChange={(e) => handleCardMask(e, "name")}
                     onFocus={() => setIsFlipped(false)}
@@ -474,7 +557,7 @@ export default function Step3_Payment({
                   {touched.name && !errors.name && <RenderCheckIcon />}
                   {touched.name && errors.name && (
                     <p className="absolute -bottom-4 right-0 text-[9px] text-red-500 font-bold uppercase animate-pulse">
-                      informe o nome do titular
+                      informe o titular
                     </p>
                   )}
                 </div>
@@ -489,15 +572,7 @@ export default function Step3_Payment({
                       type="text"
                       placeholder="MM/AA"
                       maxLength={5}
-                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none text-center transition-all placeholder-muted-foreground ${
-                        touched.expiry && !errors.expiry
-                          ? "border-green-500 focus:border-green-500"
-                          : ""
-                      } ${
-                        touched.expiry && errors.expiry
-                          ? "border-red-500 focus:border-red-500"
-                          : "border-border focus:border-sky-500"
-                      }`}
+                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none text-center transition-all placeholder-muted-foreground ${touched.expiry && !errors.expiry ? "border-green-500 focus:border-green-500" : ""} ${touched.expiry && errors.expiry ? "border-red-500 focus:border-red-500" : "border-border focus:border-sky-500"}`}
                       value={cardData.expiry}
                       onChange={(e) => handleCardMask(e, "expiry")}
                       onFocus={() => setIsFlipped(false)}
@@ -520,15 +595,7 @@ export default function Step3_Payment({
                       type="text"
                       placeholder="123"
                       maxLength={4}
-                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none text-center transition-all placeholder-muted-foreground ${
-                        touched.cvv && !errors.cvv
-                          ? "border-green-500 focus:border-green-500"
-                          : ""
-                      } ${
-                        touched.cvv && errors.cvv
-                          ? "border-red-500 focus:border-red-500"
-                          : "border-border focus:border-sky-500"
-                      }`}
+                      className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground outline-none text-center transition-all placeholder-muted-foreground ${touched.cvv && !errors.cvv ? "border-green-500 focus:border-green-500" : ""} ${touched.cvv && errors.cvv ? "border-red-500 focus:border-red-500" : "border-border focus:border-sky-500"}`}
                       value={cardData.cvv}
                       onChange={(e) => handleCardMask(e, "cvv")}
                       onFocus={() => setIsFlipped(true)}
@@ -576,10 +643,22 @@ export default function Step3_Payment({
                     }
                     onFocus={() => setIsFlipped(false)}
                   >
-                    <option value="1">1x de R$ 99,90 (Sem juros)</option>
-                    <option value="2">2x de R$ 49,95 (Sem juros)</option>
-                    <option value="3">3x de R$ 33,30 (Sem juros)</option>
-                    <option value="4">4x de R$ 24,97 (Sem juros)</option>
+                    <option value="1">
+                      1x de R$ {totalAmount.toFixed(2).replace(".", ",")} (Sem
+                      juros)
+                    </option>
+                    <option value="2">
+                      2x de R$ {(totalAmount / 2).toFixed(2).replace(".", ",")}{" "}
+                      (Sem juros)
+                    </option>
+                    <option value="3">
+                      3x de R$ {(totalAmount / 3).toFixed(2).replace(".", ",")}{" "}
+                      (Sem juros)
+                    </option>
+                    <option value="4">
+                      4x de R$ {(totalAmount / 4).toFixed(2).replace(".", ",")}{" "}
+                      (Sem juros)
+                    </option>
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                     <svg
@@ -646,7 +725,12 @@ export default function Step3_Payment({
               onClick={handlePaymentSubmit}
               className="group relative w-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg uppercase tracking-widest shadow-lg shadow-sky-900/20 transform active:scale-[0.98] transition-all flex items-center justify-center mt-6"
             >
-              <span className="text-sm">PAGAR COM PIX</span>
+              <span className="text-sm">
+                GERAR PIX DE R${" "}
+                {(totalAmount * 0.95).toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
               <div className="absolute right-6 flex items-center group-hover:translate-x-1 transition-transform">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

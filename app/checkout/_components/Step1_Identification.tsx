@@ -19,6 +19,8 @@ export default function Step1_Identification({
 }: Step1Props) {
   const [errors, setErrors] = useState<any>({});
   const [touched, setTouched] = useState<any>({});
+  // NOVO: Controle de loading
+  const [isLoading, setIsLoading] = useState(false);
 
   // --- VALIDAÇÕES (Mantidas idênticas) ---
   const isValidCPF = (cpf: string) => {
@@ -82,11 +84,15 @@ export default function Step1_Identification({
     setErrors((prev: any) => ({ ...prev, [field]: !isValid }));
   };
 
-  const handleContinue = () => {
+  // --- NOVA LÓGICA DE CONTINUAR ---
+  const handleContinue = async () => {
+    if (isLoading) return;
+
     const nameValid = validators.name(customer.name);
     const emailValid = validators.email(customer.email);
     const cpfValid = validators.cpf(customer.cpf);
     const phoneValid = validators.phone(customer.phone);
+
     setTouched({ name: true, email: true, cpf: true, phone: true });
     setErrors({
       name: !nameValid,
@@ -94,10 +100,35 @@ export default function Step1_Identification({
       cpf: !cpfValid,
       phone: !phoneValid,
     });
-    if (nameValid && emailValid && cpfValid && phoneValid) completeStep();
-  };
 
-  // --- RENDERIZAÇÃO ---
+    if (nameValid && emailValid && cpfValid && phoneValid) {
+      setIsLoading(true);
+      try {
+        // Envia para nossa API interna que falará com a AWS
+        const response = await fetch("/api/checkout/identify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(customer), // Mandamos { name, email, cpf, phone }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // Se deu tudo certo no backend, avança a etapa!
+          completeStep();
+        } else {
+          alert(
+            `Erro de identificação: ${result.message || "Verifique seus dados"}`,
+          );
+        }
+      } catch (error) {
+        console.error("Erro ao conectar", error);
+        alert("Erro de conexão ao salvar identificação.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
   // 1. ESTADO FECHADO (RESUMO)
   if (currentStep > 1) {
@@ -163,7 +194,6 @@ export default function Step1_Identification({
     <div
       className={`bg-card border rounded-2xl overflow-hidden transition-all duration-300 shadow-sm ${currentStep === 1 ? "border-sky-500 ring-1 ring-sky-500/20" : "border-border opacity-50"}`}
     >
-      {/* HEADER: Removi bg-muted para evitar o cinza no topo do Dark Mode. Mantive border-b */}
       <div className="p-5 border-b border-border flex items-center gap-3">
         <div className="w-6 h-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center text-xs font-bold shadow-inner">
           1
@@ -188,8 +218,7 @@ export default function Step1_Identification({
               <input
                 type="text"
                 placeholder="Ex: Maria da Silva"
-                className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all 
-                ${touched.name && !errors.name ? "border-green-500" : touched.name && errors.name ? "border-red-500" : "border-border focus:border-sky-500"}`}
+                className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all ${touched.name && !errors.name ? "border-green-500" : touched.name && errors.name ? "border-red-500" : "border-border focus:border-sky-500"}`}
                 value={customer.name}
                 onChange={(e) => handleChange(e, "name")}
                 onBlur={() => handleBlur("name")}
@@ -226,8 +255,7 @@ export default function Step1_Identification({
               <input
                 type="email"
                 placeholder="Ex: maria@gmail.com"
-                className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all 
-                ${touched.email && !errors.email ? "border-green-500" : touched.email && errors.email ? "border-red-500" : "border-border focus:border-sky-500"}`}
+                className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all ${touched.email && !errors.email ? "border-green-500" : touched.email && errors.email ? "border-red-500" : "border-border focus:border-sky-500"}`}
                 value={customer.email}
                 onChange={(e) => handleChange(e, "email")}
                 onBlur={() => handleBlur("email")}
@@ -260,8 +288,7 @@ export default function Step1_Identification({
                 type="text"
                 placeholder="000.000.000-00"
                 maxLength={14}
-                className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all 
-                ${touched.cpf && !errors.cpf ? "border-green-500" : touched.cpf && errors.cpf ? "border-red-500" : "border-border focus:border-sky-500"}`}
+                className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all ${touched.cpf && !errors.cpf ? "border-green-500" : touched.cpf && errors.cpf ? "border-red-500" : "border-border focus:border-sky-500"}`}
                 value={customer.cpf}
                 onChange={(e) => handleChange(e, "cpf")}
                 onBlur={() => handleBlur("cpf")}
@@ -303,8 +330,7 @@ export default function Step1_Identification({
                   type="text"
                   placeholder="(00) 00000-0000"
                   maxLength={15}
-                  className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all 
-                  ${touched.phone && !errors.phone ? "border-green-500" : touched.phone && errors.phone ? "border-red-500" : "border-border focus:border-sky-500"}`}
+                  className={`w-full h-12 bg-background border rounded-lg px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all ${touched.phone && !errors.phone ? "border-green-500" : touched.phone && errors.phone ? "border-red-500" : "border-border focus:border-sky-500"}`}
                   value={customer.phone}
                   onChange={(e) => handleChange(e, "phone")}
                   onBlur={() => handleBlur("phone")}
@@ -332,25 +358,30 @@ export default function Step1_Identification({
 
         <button
           onClick={handleContinue}
-          className="group relative w-full mt-8 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg uppercase tracking-widest shadow-lg shadow-sky-900/20 transform active:scale-[0.98] transition-all flex items-center justify-center"
+          disabled={isLoading}
+          className="group relative w-full mt-8 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg uppercase tracking-widest shadow-lg shadow-sky-900/20 transform active:scale-[0.98] transition-all flex items-center justify-center disabled:opacity-70"
         >
-          <span className="text-sm">CONTINUAR</span>
-          <div className="absolute right-6 flex items-center group-hover:translate-x-1 transition-transform">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-              />
-            </svg>
-          </div>
+          <span className="text-sm">
+            {isLoading ? "VERIFICANDO..." : "CONTINUAR"}
+          </span>
+          {!isLoading && (
+            <div className="absolute right-6 flex items-center group-hover:translate-x-1 transition-transform">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={3}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
+              </svg>
+            </div>
+          )}
         </button>
 
         <div className="mt-6 pt-4 border-t border-border flex justify-center gap-2">

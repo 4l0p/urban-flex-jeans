@@ -85,12 +85,14 @@ function CheckoutContent() {
   const [shippingMethod, setShippingMethod] = useState<"free" | "express">(
     "free",
   );
+
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
     cpf: "",
     phone: "",
   });
+
   const [address, setAddress] = useState({
     cep: "",
     street: "",
@@ -100,6 +102,7 @@ function CheckoutContent() {
     city: "",
     state: "",
   });
+
   const [paymentMethod, setPaymentMethod] = useState<
     "credit" | "pix" | "boleto"
   >("credit");
@@ -109,6 +112,10 @@ function CheckoutContent() {
   const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 10 });
   const [isExpired, setIsExpired] = useState(false);
   const [showExpiredText, setShowExpiredText] = useState(true);
+
+  // --- CÁLCULO DO TOTAL ---
+  const shippingCost = shippingMethod === "express" ? 14.9 : 0;
+  const totalAmount = productPrice * quantity + shippingCost;
 
   // --- 1. BUSCA O PREÇO DO BANCO (PRIORIDADE MÁXIMA) ---
   useEffect(() => {
@@ -128,7 +135,7 @@ function CheckoutContent() {
     fetchPrice();
   }, []);
 
-  // --- 2. RECUPERA DADOS DA SESSÃO (EXCETO O PREÇO) ---
+  // --- 2. RECUPERA DADOS DA SESSÃO ---
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedData = sessionStorage.getItem("checkoutData");
@@ -137,7 +144,6 @@ function CheckoutContent() {
           const data = JSON.parse(storedData);
           if (data.size) setSelectedSize(data.size);
           if (data.shipping) setShippingMethod(data.shipping);
-          // Omitimos o data.price aqui para garantir que o useEffect anterior (do banco) mande no valor.
         } catch (error) {
           console.error(error);
         }
@@ -178,55 +184,32 @@ function CheckoutContent() {
   };
   const nextStep = () => setCurrentStep((prev) => prev + 1);
 
+  // --- FINALIZAÇÃO (Agora só faz o redirecionamento, a API foi chamada no Step3) ---
   const handleFinishCheckout = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
+
     try {
-      const totalProductPrice = productPrice * quantity;
-      const cartItem = {
-        name: "Kit 2 Camisas Urban Flex Jeans",
-        size: selectedSize,
-        quantity: quantity,
-        price: productPrice,
-      };
-      const payload = {
+      // Como o pagamento via PIX já foi processado e salvo no backend dentro do Step3_Payment,
+      // aqui nós apenas montamos o resumo e enviamos o cliente para a página de sucesso (Thank You)
+      const dataForThankYouPage = {
         customer,
         address,
-        cart: [cartItem],
         paymentMethod,
-        totalAmount: totalProductPrice,
+        shipping: shippingMethod,
+        size: selectedSize,
+        price: productPrice * quantity,
+        quantity: quantity,
       };
 
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.success) {
-        const dataForThankYouPage = {
-          customer,
-          address,
-          paymentMethod,
-          shipping: shippingMethod,
-          size: selectedSize,
-          price: totalProductPrice,
-          quantity: quantity,
-          orderId: data.orderId,
-        };
-        sessionStorage.setItem(
-          "checkoutData",
-          JSON.stringify(dataForThankYouPage),
-        );
-        router.push("/checkout/thank-you");
-      } else {
-        setIsSubmitting(false);
-        alert("Houve um erro ao processar seu pedido.");
-      }
+      sessionStorage.setItem(
+        "checkoutSummary",
+        JSON.stringify(dataForThankYouPage),
+      );
+      router.push("/checkout/thank-you");
     } catch (error) {
       setIsSubmitting(false);
-      alert("Erro ao conectar com o servidor.");
+      alert("Erro ao finalizar a tela.");
     }
   };
 
@@ -351,11 +334,15 @@ function CheckoutContent() {
         </div>
         <div className="lg:col-span-4 order-3 lg:order-2">
           <div className={currentStep === 3 ? "block" : "hidden lg:block"}>
+            {/* AQUI ESTÁ A MUDANÇA: PASSANDO CUSTOMER E TOTAL_AMOUNT PARA O STEP 3 */}
             <Step3_Payment
               currentStep={currentStep}
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               onFinish={handleFinishCheckout}
+              customer={customer}
+              totalAmount={totalAmount}
+              address={address}
             />
             <div className="md:hidden mt-4">
               <SocialProof />
@@ -391,7 +378,7 @@ function CheckoutContent() {
             <img className="w-20 h-auto" src="/pix.png" alt="" />
           </div>
           <p className="text-[10px] text-muted-foreground">
-            URBAN FLEX ® 2025. Todos os direitos reservados.
+            URBAN FLEX ® 2026. Todos os direitos reservados.
           </p>
         </div>
       </footer>
