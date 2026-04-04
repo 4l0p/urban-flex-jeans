@@ -103,27 +103,48 @@ export default function Step1_Identification({
 
     if (nameValid && emailValid && cpfValid && phoneValid) {
       setIsLoading(true);
+
       try {
-        // Envia para nossa API interna que falará com a AWS
-        const response = await fetch("/api/checkout/identify", {
+        // 1. Cria um ID único para essa compra ou recupera se já existir
+        let currentCheckoutId = sessionStorage.getItem("checkoutId");
+        if (!currentCheckoutId) {
+          currentCheckoutId = crypto.randomUUID(); // Gera um ID padrão universal
+          sessionStorage.setItem("checkoutId", currentCheckoutId);
+        }
+
+        // 2. MONTA O JSON EXATAMENTE COMO O SEU DEV BACKEND PEDIU
+        const bodyParaOBackend = {
+          checkoutId: currentCheckoutId,
+          nomeCompleto: customer.name,
+          email: customer.email,
+          cpf: customer.cpf.replace(/\D/g, ""), // Remove pontos e traços, envia só números
+          celular: customer.phone.replace(/\D/g, ""), // Remove parênteses e traços
+        };
+
+        console.log("Enviando para o backend:", bodyParaOBackend);
+
+        // 3. FAZ O ENVIO DIRETO PARA A API DELE
+        // ATENÇÃO: Substitua a URL abaixo pelo caminho correto da API dele (ex: "/api/identify" ou "http://localhost:3000/api/checkout")
+        const response = await fetch("/caminho/da/api/do/dev/aqui", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(customer), // Mandamos { name, email, cpf, phone }
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyParaOBackend),
         });
 
-        const result = await response.json();
-
         if (response.ok) {
-          // Se deu tudo certo no backend, avança a etapa!
+          // Deu 200 OK no backend dele, avança para a Etapa 2 de Entrega
           completeStep();
         } else {
+          const errorData = await response.json();
           alert(
-            `Erro de identificação: ${result.message || "Verifique seus dados"}`,
+            `Erro retornado pelo backend: ${errorData.message || "Verifique os dados"}`,
           );
         }
       } catch (error) {
-        console.error("Erro ao conectar", error);
-        alert("Erro de conexão ao salvar identificação.");
+        console.error("Erro na requisição:", error);
+        alert("Erro ao tentar comunicar com o servidor.");
       } finally {
         setIsLoading(false);
       }
