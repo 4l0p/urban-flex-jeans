@@ -105,46 +105,71 @@ export default function Step1_Identification({
       setIsLoading(true);
 
       try {
-        // 1. Cria um ID único para essa compra ou recupera se já existir
+        // 1. Pega ou cria o checkoutId (Seu back-end usa isso como chave primária)
         let currentCheckoutId = sessionStorage.getItem("checkoutId");
         if (!currentCheckoutId) {
-          currentCheckoutId = crypto.randomUUID(); // Gera um ID padrão universal
+          currentCheckoutId = crypto.randomUUID();
           sessionStorage.setItem("checkoutId", currentCheckoutId);
         }
 
-        // 2. MONTA O JSON EXATAMENTE COMO O SEU DEV BACKEND PEDIU
-        const bodyParaOBackend = {
-          checkoutId: currentCheckoutId,
+        // 2. Monta o payload EXATAMENTE igual ao formData do seu JS antigo
+        const formData = {
           nomeCompleto: customer.name,
           email: customer.email,
-          cpf: customer.cpf.replace(/\D/g, ""), // Remove pontos e traços, envia só números
-          celular: customer.phone.replace(/\D/g, ""), // Remove parênteses e traços
+          cpf: customer.cpf,
+          celular: customer.phone,
+          checkoutId: currentCheckoutId,
         };
 
-        console.log("Enviando para o backend:", bodyParaOBackend);
+        // 3. Define a URL base da sua API (Você pode colocar isso no .env local depois)
+        const apiBaseUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"; // <-- Substitua pela URL real do seu back-end
 
-        // 3. FAZ O ENVIO DIRETO PARA A API DELE
-        // ATENÇÃO: Substitua a URL abaixo pelo caminho correto da API dele (ex: "/api/identify" ou "http://localhost:3000/api/checkout")
-        const response = await fetch("/caminho/da/api/do/dev/aqui", {
+        // 4. Faz o envio direto para a sua API pronta
+        const res = await fetch(`${apiBaseUrl}/checkout/identify`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(bodyParaOBackend),
+          body: JSON.stringify(formData),
         });
 
-        if (response.ok) {
-          // Deu 200 OK no backend dele, avança para a Etapa 2 de Entrega
+        const result = await res.json();
+
+        if (res.ok) {
+          // Mantendo a lógica de Analytics do seu código antigo
+          if (typeof window !== "undefined" && (window as any).dataLayer) {
+            (window as any).dataLayer.push({
+              event: "identify",
+              ecommerce: {
+                currency: "BRL",
+                item_name: "Camisa UrbanFlex",
+                user_name: formData.nomeCompleto,
+                email: formData.email,
+                user_cpf: formData.cpf,
+                user_phone: formData.celular,
+              },
+            });
+          }
+
+          // Salvando no storage igual ao antigo, mas usando sessionStorage (mais seguro para checkout)
+          let formThanks = JSON.parse(
+            sessionStorage.getItem("formThanks") || "{}",
+          );
+          formThanks.nomeCompleto = formData.nomeCompleto;
+          formThanks.email = formData.email;
+          formThanks.celular = formData.celular;
+          sessionStorage.setItem("formThanks", JSON.stringify(formThanks));
+
+          // Tudo certo! Avança para o Passo 2
           completeStep();
         } else {
-          const errorData = await response.json();
-          alert(
-            `Erro retornado pelo backend: ${errorData.message || "Verifique os dados"}`,
-          );
+          alert("Erro ao enviar: " + (result.message || "Erro desconhecido"));
+          console.error(result);
         }
-      } catch (error) {
-        console.error("Erro na requisição:", error);
-        alert("Erro ao tentar comunicar com o servidor.");
+      } catch (err) {
+        alert("Erro ao conectar com o servidor.");
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
